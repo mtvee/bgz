@@ -10,6 +10,7 @@ class Bugz:
     def __init__( self ):
         self.dir_name = '.bugz'
         self.editor_cmd = 'vi'
+        self._find_bugs_dir()
         try:
             import readline
         except:
@@ -177,6 +178,16 @@ class Bugz:
             for f in flist:
                 print f
         return None
+        
+    def _find_bugs_dir( self ):
+        """this walks up the path and tries to find the bugs dir"""
+        curpath = os.path.abspath(os.curdir)
+        while len(curpath):
+            if os.path.exists(os.path.join(curpath, self.dir_name)):
+                self.dir_name = os.path.join(curpath, self.dir_name)
+                return True
+            curpath = curpath[0:curpath.rfind('/')]
+        return False
         
     def _check_status( self ):
         """ make sure we have a database to work with """
