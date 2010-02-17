@@ -10,6 +10,8 @@ class Bugz:
     def __init__( self ):
         self.dir_name = '.bugz'
         self.editor_cmd = 'vi'
+        self.user_id = os.environ['USER']
+        self._read_init()
         self._find_bugs_dir()
         try:
             import readline
@@ -135,7 +137,7 @@ class Bugz:
         self._check_status()
         title = self._read_input('Title')
         type = self._read_input( 'Type: (b)ug, (f)eature, (t)ask?', 'b', ('b','t','f'))
-        author = self._read_input('Author',os.environ['USER'])
+        author = self._read_input('Author',self.user_id)
         desc = self._read_multiline('Descr')
         comm = self._read_multiline('Comment')
         
@@ -178,22 +180,6 @@ class Bugz:
             for f in flist:
                 print f
         return None
-        
-    def _find_bugs_dir( self ):
-        """this walks up the path and tries to find the bugs dir"""
-        curpath = os.path.abspath(os.curdir)
-        while len(curpath):
-            if os.path.exists(os.path.join(curpath, self.dir_name)):
-                self.dir_name = os.path.join(curpath, self.dir_name)
-                return True
-            curpath = curpath[0:curpath.rfind('/')]
-        return False
-        
-    def _check_status( self ):
-        """ make sure we have a database to work with """
-        if not os.path.exists( self.dir_name ):
-            print 'Database not found: ' + self.dir_name
-            sys.exit( 1 )
     
     def _read_input( self, prompt, dflt = None, valid = None ):
         """ read one line user input """
@@ -234,4 +220,50 @@ class Bugz:
                 if not line.startswith('###'):
                     lines.append(line)
         return "".join(lines)
+
+    def _read_init( self ):
+        """ try and find the init file and read it """
+        init_file = os.path.join(os.getenv("HOME"), ".bugzrc")
+        if not os.path.exists( init_file ):
+            print "Init file not found, creating [%s]..." % init_file
+            user = self._read_input("Your name: ", os.getenv("USER"))
+            email = self._read_input("You email: ", user + "@" + os.uname()[1])
+            f = open( init_file, 'w' )
+            f.write("user=" + user + "\n")
+            f.write("email=" + email + "\n")
+            f.close()
+            print "Created " + init_file
+        f = open( init_file, 'r' )
+        lines = f.readlines()
+        f.close()
+        user = self.user_id
+        email = ''
+        for line in lines:
+            line = line.strip()
+            if line[0] == '#':
+                continue
+            tmp = line.split('=')
+            if(tmp[0] == 'user'):
+                user = tmp[1].strip()
+            if(tmp[0] == 'email'):
+                email = tmp[1].strip()
+        self.user_id = user
+        if len(email):
+            self.user_id += " <" + email + '>'
         
+        
+    def _find_bugs_dir( self ):
+        """this walks up the path and tries to find the bugs dir"""
+        curpath = os.path.abspath(os.curdir)
+        while len(curpath):
+            if os.path.exists(os.path.join(curpath, self.dir_name)):
+                self.dir_name = os.path.join(curpath, self.dir_name)
+                return True
+            curpath = curpath[0:curpath.rfind('/')]
+        return False
+
+    def _check_status( self ):
+        """ make sure we have a database to work with """
+        if not os.path.exists( self.dir_name ):
+            print 'Database not found: ' + self.dir_name
+            sys.exit( 1 )
