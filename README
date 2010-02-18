@@ -36,10 +36,14 @@ Running
 Bugz will walk up the directory tree to find its files so you can run it 
 from anywhere in the tree.
 
+Changes
+-------
+2010-02-18 - pushed to http://github.com/mtvee/bgz  v0.0.1
+
 TODO
 ----
 [ ] - easy ties/links to various VCSs
-[ ] - some easy way to keep track of time spent and totals
+[-] - some easy way to keep track of time spent and totals
 [ ] - reporter output for pretty overview (html. excel) for mail/publish
 [ ] - fix for windows' path stupidity and user defaults
 [x] - have editor configurable from rc

@@ -1,7 +1,17 @@
+# encoding: utf-8
+"""
+bgz
+http://github.com/mtvee/bgz
+License Mozilla Public License 1.1 (MPL 1.1)
+Copyright (c) 2010 J. Knight. All rights reserved.
+"""
 
 import sys
 import types
 
+# -----------------
+# F A C T O R Y
+# -----------------
 class WriterFactory:
     def __init__( self ):
         pass
@@ -11,7 +21,12 @@ class WriterFactory:
             return ExcelXMLWriter()
         elif which == 'csv':
             return CSVWriter()
+        elif which == 'html':
+            return HTMLWriter()
 
+# -----------------
+# B A S E
+# -----------------
 class BaseWriter:
     """ Basic Writer """
     def __init__( self ):
@@ -39,6 +54,9 @@ class BaseWriter:
         """ output a line with EOL """
         self.out.write( str + self.EOL )
 
+# -----------------
+# C S V
+# -----------------
 class CSVWriter( BaseWriter ):
     def __init__( self ):
         BaseWriter.__init__( self ) 
@@ -63,8 +81,66 @@ class CSVWriter( BaseWriter ):
     def escape( self, str ):
         return str.replace('"','""')
 
+# -----------------
+# H T M L
+# -----------------
+class HTMLWriter( BaseWriter ):
+    """An HTML writer"""
+    def __init__( self ):
+        BaseWriter.__init__( self )
+
+    def write( self ):
+        self.p( self.header() )
+        self.p('<table>')
+        for line in self.data:
+            self.p('      <tr>')
+            for item in line:
+                self.p('<td>' + self.escape(str(item))  + "</td>")
+            self.p('      </tr>')
+        self.p('</table>')
+        self.p( self.footer() )
+        if self.out != sys.stdout:
+            self.out.close()
+
+    def escape( self, str ):
+        str = str.replace('&','&amp;')
+        str = str.replace('<','&lt;')
+        str = str.replace('>','&gt;')
+        return str
+
+
+    def header( self ):
+        return """
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+        <head>
+        	<title></title>
+        	<!-- style -->
+        	<style type="text/css">
+        	</style>
+
+        	<!-- meta -->
+        	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        	<meta name="keywords" content="" />
+        	<meta name="author" content="" />
+        	<meta name="generator" content="" />
+        	<meta name="description" content="" />	
+        </head>
+        <body>
+        """
+
+    def footer( self ):
+        return """ 
+        </body>
+        </html>"""
+
+# -----------------
+# X M L (Excel)
+# -----------------
 class ExcelXMLWriter( BaseWriter ):
-    """ And Excel XML 2004 Writer """
+    """ An Excel XML 2004 Writer """
     def __init__( self ):
         BaseWriter.__init__( self )
                 
@@ -72,7 +148,7 @@ class ExcelXMLWriter( BaseWriter ):
         self.p( self.header() )
         # we can output column widths here, before the data starts
         # i think the default width is 50 and I'm not sure what happens
-        # or if you can skip unaffected columns at the start    
+        # or if you can skip unaffected columns at the start
         self.p('      <Column ss:AutoFitWidth="0" ss:Width="48.0" />')
         self.p('      <Column ss:AutoFitWidth="0" ss:Width="50.0" />')
         self.p('      <Column ss:AutoFitWidth="0" ss:Width="200.0" />')
@@ -173,7 +249,7 @@ class WriterTests(unittest.TestCase):
         pass
      
     def testSomething( self ):
-        xml = WriterFactory().get_writer('xml')
+        xml = WriterFactory().get_writer('html')
         xml.setHeaders(["One","Two","Three","Four","Four and a Bit","Five"])
         xml.setData([["one","two \"for\" & 'five' < six > 6",3,"four",4.5,"five,"]])
         #xml.setFile('test.xml')

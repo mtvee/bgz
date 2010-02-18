@@ -2,8 +2,8 @@
 # encoding: utf-8
 """
 bgz
-
-Created by J Knight on 2010-02-16.
+http://github.com/mtvee/bgz
+License Mozilla Public License 1.1 (MPL 1.1)
 Copyright (c) 2010 J. Knight. All rights reserved.
 """
 
@@ -32,6 +32,7 @@ where COMMANDS are:
   show [ID|FIELD]   - show an issue. FIELD like s:open OR t:bug
   open [ID]         - open an issue
   close [ID]        - close an issue
+  time [ID]         - log some time
 '''
 
 

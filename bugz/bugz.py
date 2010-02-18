@@ -1,8 +1,15 @@
+# encoding: utf-8
+"""
+bgz
+http://github.com/mtvee/bgz
+License Mozilla Public License 1.1 (MPL 1.1)
+Copyright (c) 2010 J. Knight. All rights reserved.
+"""
 import os
 import sys
 import time
 import tempfile
-import platform
+import re
 
 from issue import Issue
 
@@ -12,6 +19,7 @@ class Bugz:
         self.dir_name = '.bugz'
         self.editor_cmd = 'vi'
         self.user_id = os.environ['USER']
+        self.user_name = self.user_id
         self._read_init()
         if self._find_bugs_dir():
             # try for a local config file            
@@ -87,6 +95,17 @@ class Bugz:
             return False
         if self.do_comment(args, 'closed'):
             return self._change_status(args[0],'closed')
+        else:
+            return False
+
+    def do_time( self, args ):
+        """ close an issue """
+        self._check_status()
+        if len(args) == 0:
+            return False
+        dur = self._read_input( "Duration (0:0)", None, lambda x: re.match("\d?:\d+", x) )
+        if len(dur) and self.do_comment(args, 'time: ' + dur ):
+            return True
         else:
             return False
 
@@ -175,6 +194,13 @@ class Bugz:
         
     def _find_issue( self, uid ):
         """ find an issue with a partial uid """
+        if uid.startswith('g'):
+            if not os.path.exists(os.path.join(self.dir_name,'general.' + self.user_name)):
+                gen = Issue(self.dir_name)
+                gen['Id'] = 'general.' + self.user_name
+                gen['Title'] = 'General Project Catchall'
+                gen['Author'] = self.user_id
+                gen.save()
         flist = self._find_issues( uid )
         if len(flist) == 1:
             iss = Issue(self.dir_name)
@@ -192,8 +218,12 @@ class Bugz:
             prompt += ' [' + dflt + ']'
         inp = raw_input( prompt + ": " )
         if valid and not dflt:
-            while inp.strip() not in valid:
-                inp = raw_input( prompt + ": " )            
+            if hasattr( valid, '__call__'):
+                while inp.strip() and not valid(inp.strip()):
+                    inp = raw_input( prompt + ": " )                                
+            else:
+                while inp.strip() not in valid:
+                    inp = raw_input( prompt + ": " )            
         if dflt and inp.strip() == '':
             inp = dflt
         return inp.strip()
@@ -232,9 +262,10 @@ class Bugz:
             return
         init_file = os.path.join(os.getenv("HOME"), ".bugzrc")
         if not os.path.exists( init_file ):
+            # this would be annoying to some, perhaps
             print "Init file not found, creating [%s]..." % init_file
             user = self._read_input("Your name: ", os.getenv("USER"))
-            email = self._read_input("You email: ", user + "@" + os.uname()[1])
+            email = self._read_input("Your email: ", user + "@" + os.uname()[1])
             f = open( init_file, 'w' )
             f.write("user=" + user + "\n")
             f.write("email=" + email + "\n")
@@ -276,6 +307,7 @@ class Bugz:
                 email = tmp[1].strip()
             if(tmp[0] == 'editor'):
                 self.editor_cmd = tmp[1].strip()
+        self.user_name = user.lower().replace(' ','_')
         self.user_id = user
         if len(email):
             self.user_id += ' <' + email + '>'
