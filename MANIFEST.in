@@ -1,2 +1,2 @@
-include README
-recursive-include bugz script
+include README bgz
+recursive-include bugz
