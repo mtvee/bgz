@@ -11,7 +11,25 @@ $> sudo python setup.py install
 Now you can run 'bugz --help' from the root of your source tree and figure
 out the rest.
 
+Config
+------
+~/.bugzrc
+--[snip]--
+# comment
+; another comment
+user=your name
+email=me@someplace.com
+editor=vi
+--[snip]--
+
 Running
 -------
 Bugz will walk up the directory tree to find its files so you can run it 
 from anywhere in the tree.
+
+
+TODO
+----
+[x] - have a ~/.bugzrc file for user info, etc
+[x] - walk up the path to find the .bugz dir, git like
+[ ] - have editor configurable from rc

@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import tempfile
+import platform
 
 from issue import Issue
 
@@ -12,8 +13,13 @@ class Bugz:
         self.editor_cmd = 'vi'
         self.user_id = os.environ['USER']
         self._read_init()
-        self._find_bugs_dir()
+        if self._find_bugs_dir():
+            # try for a local config file            
+            lconf = os.path.join(self.dir_name, 'config')
+            if os.path.exists(lconf):
+                self._read_config( lconf )
         try:
+            # readline is nice
             import readline
         except:
             pass
@@ -138,15 +144,14 @@ class Bugz:
         title = self._read_input('Title')
         type = self._read_input( 'Type: (b)ug, (f)eature, (t)ask?', 'b', ('b','t','f'))
         author = self._read_input('Author',self.user_id)
-        desc = self._read_multiline('Descr')
-        comm = self._read_multiline('Comment')
+        #desc = self._read_multiline('Descr')
+        desc = self._external_edit('\n\n### ' + title )
         
         issue = Issue( self.dir_name )
         issue['Title'] = title
         issue['Description'] = desc
         issue['Type'] = type
         issue['Author'] = author
-        issue.add_comment( comm )
         issue.save()        
         print 'Added: ' + str(issue)
         
@@ -219,10 +224,12 @@ class Bugz:
             for line in data:
                 if not line.startswith('###'):
                     lines.append(line)
-        return "".join(lines)
+        return "".join(lines).rstrip()
 
     def _read_init( self ):
         """ try and find the init file and read it """
+        if os.name != 'posix':
+            return
         init_file = os.path.join(os.getenv("HOME"), ".bugzrc")
         if not os.path.exists( init_file ):
             print "Init file not found, creating [%s]..." % init_file
@@ -233,24 +240,7 @@ class Bugz:
             f.write("email=" + email + "\n")
             f.close()
             print "Created " + init_file
-        f = open( init_file, 'r' )
-        lines = f.readlines()
-        f.close()
-        user = self.user_id
-        email = ''
-        for line in lines:
-            line = line.strip()
-            if line[0] == '#':
-                continue
-            tmp = line.split('=')
-            if(tmp[0] == 'user'):
-                user = tmp[1].strip()
-            if(tmp[0] == 'email'):
-                email = tmp[1].strip()
-        self.user_id = user
-        if len(email):
-            self.user_id += " <" + email + '>'
-        
+        self._read_config( init_file )
         
     def _find_bugs_dir( self ):
         """this walks up the path and tries to find the bugs dir"""
@@ -267,3 +257,25 @@ class Bugz:
         if not os.path.exists( self.dir_name ):
             print 'Database not found: ' + self.dir_name
             sys.exit( 1 )
+
+    def _read_config( self, conf ):
+        """ read in a config file """
+        f = open( conf, 'r' )
+        lines = f.readlines()
+        f.close()
+        user = self.user_id
+        email = ''
+        for line in lines:
+            line = line.strip()
+            if line[0] == '#' or line[0] == ';':
+                continue
+            tmp = line.split('=')
+            if(tmp[0] == 'user'):
+                user = tmp[1].strip()
+            if(tmp[0] == 'email'):
+                email = tmp[1].strip()
+            if(tmp[0] == 'editor'):
+                self.editor_cmd = tmp[1].strip()
+        self.user_id = user
+        if len(email):
+            self.user_id += ' <' + email + '>'
