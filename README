@@ -1,6 +1,7 @@
 Bugz is a simple command line bug tracking tool written in python. It uses
-ascii text files to keep a database of bugs so it can live in the source
-tree of the project and become part of the versioning system.
+ascii text files (actually pickles at the moment) to keep a database of 
+bugs so it can live in the source tree of the project and become part of 
+the versioning system.
 
 Installing
 ----------
@@ -27,9 +28,12 @@ Running
 Bugz will walk up the directory tree to find its files so you can run it 
 from anywhere in the tree.
 
-
 TODO
 ----
+[ ] - easy ties/links to various VCSs
+[ ] - some easy way to keep track of time spent and totals
+[ ] - reporter output for pretty overview (html. excel) for mail/publish
+[ ] - fix for windows' path stupidity and user defaults
+[x] - have editor configurable from rc
 [x] - have a ~/.bugzrc file for user info, etc
 [x] - walk up the path to find the .bugz dir, git like
-[ ] - have editor configurable from rc

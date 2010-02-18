@@ -16,7 +16,7 @@ setup( name = 'bugz',
       author_email = 'jim@j2mfk.com',
       url = 'http://j2mfk.com/projects/bugz/',
       packages = ['bugz'],
-      scripts = ['scripts/bugz'],
+      scripts = ['bgz'],
       long_description = """A simple commandline bug tracker that lives in
       the project root and gets versioned along with the source.
       """,

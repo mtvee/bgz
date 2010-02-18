@@ -11,12 +11,6 @@ import os
 import sys
 import getopt
 
-# this is because I develop this inside a 'scripts' dir at the same
-# level as the package and the script is the same name as the package.
-# it is not needed if the app is properly installed
-if os.path.abspath(os.path.dirname(__file__)).endswith('scripts'):
-    sys.path.append(os.path.abspath(os.path.dirname(__file__))[:-7])
-
 from bugz.bugz import Bugz
 
 
