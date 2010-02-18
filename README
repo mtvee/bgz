@@ -5,12 +5,18 @@ the versioning system.
 
 Installing
 ----------
-Unfold the archive and type:
+Unfold the archive or checkout the source tree and type:
 
 $> sudo python setup.py install
 
-Now you can run 'bugz --help' from the root of your source tree and figure
-out the rest.
+to install or you can just 
+
+$> chmod +x ./bgz
+
+and run it in place.
+
+Now you can run 'bgz --help' from the root of your source tree and 
+possibly figure out the rest. Reading the source may help or hinder.
 
 Config
 ------
