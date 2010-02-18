@@ -18,7 +18,7 @@
 # All Rights Reserved.
 #
 # Contributor(s): 
-#  J. Knight <jim@j2mfk.com>
+#  J. Knight <emptyvee@gmail.com>
 #
 # Alternatively, the contents of this file may be used under the terms
 # of the Gnu Public License Version 2 license (the  "GPL License"), 
@@ -33,6 +33,6 @@
 # ------------------------------------------------------------------------
 
 __version__ = "0.0.1"
-__author__ = "J. Knight <jim@j2mfk.com>"
+__author__ = "J. Knight <emptyvee@gmail.com>"
 __license__ = "Mozilla Public License (MPL) 1.1"
 __url__ = 'http://j2mfk.com/projects/bugz'
