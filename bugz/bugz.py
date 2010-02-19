@@ -104,7 +104,7 @@ class Bugz:
         if len(args) == 0:
             return False
         dur = self._read_input( "Duration (0:0)", None, lambda x: re.match("\d?:\d+", x) )
-        if len(dur) and self.do_comment(args, 'time: ' + dur ):
+        if len(dur) and self.do_comment(args, 'time ' + dur ):
             return True
         else:
             return False
@@ -200,6 +200,8 @@ class Bugz:
                 gen['Id'] = 'general.' + self.user_name
                 gen['Title'] = 'General Project Catchall'
                 gen['Author'] = self.user_id
+                gen['Type'] = 'task'
+                gen['Status'] = 'open'
                 gen.save()
         flist = self._find_issues( uid )
         if len(flist) == 1:

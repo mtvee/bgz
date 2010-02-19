@@ -29,6 +29,7 @@ class Issue(UserDict.UserDict):
                     'Date':time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                     'Status':'new',
                     'Author':'anon',
+                    'Type':'b',
                     'Description':''}
         for key in self.defaults.keys():
             self.data[key] = self.defaults[key]
@@ -47,6 +48,7 @@ class Issue(UserDict.UserDict):
         print '       Date: ' + self['Date']
         print '         Id: ' + self['Id']
         print '     Status: ' + self['Status']
+        print '     Status: ' + self['Type']
         print '     Author: ' + self['Author']
         print 'Description: ' 
         print '-----------'
