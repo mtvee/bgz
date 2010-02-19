@@ -37,7 +37,8 @@ class Issue(UserDict.UserDict):
     def __str__( self ):
         """ return a short descriptive string thing """
         tmp = self['Id'].split('-')
-        ret = "%s - %s/%s - %s" % (tmp[0],self['Type'],self['Status'].ljust(6),self['Title'])
+        tm = self.time_total()
+        ret = "%12s - %s/%s - %2d:%02d - %s" % (tmp[0],self['Type'][0],self['Status'].ljust(6),tm[0],tm[1],self['Title'])
         if len(ret) > 75:
             ret = ret[0:75] + "..."
         return ret
@@ -48,7 +49,7 @@ class Issue(UserDict.UserDict):
         print '       Date: ' + self['Date']
         print '         Id: ' + self['Id']
         print '     Status: ' + self['Status']
-        print '     Status: ' + self['Type']
+        print '       Type: ' + self['Type']
         print '     Author: ' + self['Author']
         print 'Description: ' 
         print '-----------'
@@ -61,6 +62,21 @@ class Issue(UserDict.UserDict):
             print self.comments[key].strip()
             print
         
+    def time_total( self ):
+        tm = [0,0]
+        for k, v in self.comments.iteritems():
+            if v.startswith('time '):
+                parts = v[5:].split(":")
+                for i in range(len(parts)):
+                    try:
+                        tm[i] += int(parts[i])
+                    except:
+                        pass
+        tm[0] += tm[1] / 60
+        tm[1] = tm[1] % 60
+        return tm
+                    
+            
     def add_comment( self, comment ):
         """ add a comment """
         if len(comment.strip()):
