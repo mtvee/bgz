@@ -13,9 +13,9 @@ class DateParser:
     """ English date parsing class """
     def __init__( self ):
         pass
-        
-    
+            
     def parse( self, dt ):
+        """ parse some enlishy date into a datetime.datetime """
         ret = datetime.datetime.now()
         if dt.startswith('y'):
             ret = ret - datetime.timedelta(1)
