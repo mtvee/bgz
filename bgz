@@ -32,7 +32,7 @@ where COMMANDS are:
   show [ID|FIELD]   - show an issue. FIELD like s:open OR t:bug
   open [ID]         - open an issue
   close [ID]        - close an issue
-  time [ID]         - log some time
+  time [add ID|]    - log/show time
 '''
 
 

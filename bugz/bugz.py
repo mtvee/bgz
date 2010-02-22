@@ -101,16 +101,29 @@ class Bugz:
             return False
 
     def do_time( self, args ):
-        """ close an issue """
+        """ add or report time """
         self._check_status()
         if len(args) == 0:
             return False
-        dur = self._read_input( "Duration (0:0)", None, lambda x: re.match("\d?:\d+", x) )
-        if len(dur) and self.do_comment(args, 'time ' + dur ):
-            return True
+        if args[0] == 'add':
+            if len(args) < 2:
+                return False
+            dur = self._read_input( "Duration (0:0)", None, lambda x: re.match("\d?:\d+", x) )
+            if len(dur) and self.do_comment(args[1:], 'time ' + dur ):
+                return True
+            else:
+                return False
         else:
-            return False
-
+            # QnD report
+            dts = self._parse_date_range( args[0] )
+            files = os.listdir( self.dir_name )
+            issue = Issue(self.dir_name)
+            for file in files:
+                issue.load( file )
+                tm = issue.time_total( dts ) 
+                if tm[0] > 0 or tm[1] > 0:
+                    print issue
+            
     def do_edit( self, args ):
         """ edit the issue """
         self._check_status()
@@ -155,18 +168,9 @@ class Bugz:
                         elif tmp[0][0] == 't' and issue['Type'][0] == tmp[1][0]:
                             print issue
                         elif tmp[0][0] == 'd':
-                            # date, maybe range
-                            dts = tmp[1].split(':')
-                            if len(dts) > 1:
-                                sdate = self._parse_date( dts[0] )
-                                edate = self._parse_date( dts[1] ) 
-                            else:
-                                sdate = self._parse_date( dts[0] )
-                                edate = datetime.datetime.now()
-                            #print sdate
-                            #print edate
-                            #print
-                            if issue.date() >= sdate and issue.date() <= edate:
+                            # date range
+                            dts = self._parse_date_range( tmp[1] )
+                            if issue.date() >= dts[0] and issue.date() <= dts[1]:
                                 print issue
                 else:
                     if args[0][0] == '/':
@@ -313,6 +317,16 @@ class Bugz:
 
     def _parse_date( self, dt ):
         return dparse.DateParser().parse( dt )
+        
+    def _parse_date_range( self, tmp ):
+        dts = tmp.split(':')
+        if len(dts) > 1:
+            sdate = self._parse_date( dts[0] )
+            edate = self._parse_date( dts[1] ) 
+        else:
+            sdate = self._parse_date( dts[0] )
+            edate = datetime.datetime.now()
+        return (sdate,edate)
         
     def _read_config( self, conf ):
         """ read in a config file """

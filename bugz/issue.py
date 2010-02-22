@@ -66,9 +66,13 @@ class Issue(UserDict.UserDict):
             print self.comments[key].strip()
             print
         
-    def time_total( self ):
+    def time_total( self, dts = None ):
         tm = [0,0]
         for k, v in self.comments.iteritems():
+            # ignore if we have a date range and we are outside of it
+            ct = datetime.datetime.fromtimestamp(k)
+            if dts and (ct <= dts[0] or ct >= dts[1]):
+                continue
             if v.startswith('time '):
                 parts = v[5:].split(":")
                 for i in range(len(parts)):
