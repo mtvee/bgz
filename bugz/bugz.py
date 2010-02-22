@@ -10,6 +10,8 @@ import sys
 import time
 import tempfile
 import re
+import datetime
+import dparse
 
 from issue import Issue
 
@@ -152,6 +154,20 @@ class Bugz:
                             print issue
                         elif tmp[0][0] == 't' and issue['Type'][0] == tmp[1][0]:
                             print issue
+                        elif tmp[0][0] == 'd':
+                            # date, maybe range
+                            dts = tmp[1].split(':')
+                            if len(dts) > 1:
+                                sdate = self._parse_date( dts[0] )
+                                edate = self._parse_date( dts[1] ) 
+                            else:
+                                sdate = self._parse_date( dts[0] )
+                                edate = datetime.datetime.now()
+                            #print sdate
+                            #print edate
+                            #print
+                            if issue.date() >= sdate and issue.date() <= edate:
+                                print issue
                 else:
                     if args[0][0] == '/':
                       if issue['Title'].find(args[0][1:]) != -1:
@@ -295,6 +311,9 @@ class Bugz:
             print 'Database not found: ' + self.dir_name
             sys.exit( 1 )
 
+    def _parse_date( self, dt ):
+        return dparse.DateParser().parse( dt )
+        
     def _read_config( self, conf ):
         """ read in a config file """
         f = open( conf, 'r' )

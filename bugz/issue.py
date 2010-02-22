@@ -8,6 +8,7 @@ Copyright (c) 2010 J. Knight. All rights reserved.
 
 import os
 import time
+import datetime
 import pickle
 import uuid
 import UserDict
@@ -42,6 +43,9 @@ class Issue(UserDict.UserDict):
         if len(ret) > 75:
             ret = ret[0:75] + "..."
         return ret
+        
+    def date( self ):
+        return datetime.datetime.strptime( self['Date'],"%Y-%m-%dT%H:%M:%SZ")
         
     def show( self ):
         """ print the whole mess """
