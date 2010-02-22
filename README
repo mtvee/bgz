@@ -42,9 +42,10 @@ Changes
 
 TODO
 ----
-[ ] - easy ties/links to various VCSs
+[ ] - easy ties/links to various VCSs?
 [-] - some easy way to keep track of time spent and totals
 [ ] - reporter output for pretty overview (html. excel) for mail/publish
+[ ] - need better search params for reports
 [ ] - fix for windows' path stupidity and user defaults
 [x] - have editor configurable from rc
 [x] - have a ~/.bugzrc file for user info, etc

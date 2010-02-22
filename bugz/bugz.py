@@ -144,15 +144,19 @@ class Bugz:
         for file in files:
             issue.load( file )
             if len(args):
+                # check for colon
                 if args[0].find(':') != -1:
                     for arg in args:
                         tmp = arg.split(':')
-                        if tmp[0] == 's' and issue['Status'][0] == tmp[1][0]:
+                        if tmp[0][0] == 's' and issue['Status'][0] == tmp[1][0]:
                             print issue
-                        elif tmp[0] == 't' and issue['Type'][0] == tmp[1][0]:
+                        elif tmp[0][0] == 't' and issue['Type'][0] == tmp[1][0]:
                             print issue
                 else:
-                    if file.startswith( args[0] ):
+                    if args[0][0] == '/':
+                      if issue['Title'].find(args[0][1:]) != -1:
+                          print issue  
+                    elif file.startswith( args[0] ):
                         issue.show()
             else:
                 print issue
