@@ -36,9 +36,27 @@ Running
 Bugz will walk up the directory tree to find its files so you can run it 
 from anywhere in the tree.
 
+Dates
+-----
+Date ranges can be given to 'show' and 'time' commands. They look like
+
+STARTDATE[-ENDDATE]
+
+ENDDATE defaults to now().
+
+lm | lastm[onth] 
+lw | lastw[eek]
+y[esterday]
+YYYY.mm.dd | dd.mm.YYYY | mm.dd.YYYY
+delim between fields in a date can be ':' | '/' | '-' | '.'
+but if given a range '-' will conflict with delim between start and end dates
+so use something else for the date itself
+
+
 Changes
 -------
-2010-02-18 - pushed to http://github.com/mtvee/bgz  v0.0.1
+2010-02-22 - basic handling of assoc time with an issue  		v0.0.2
+2010-02-18 - pushed to http://github.com/mtvee/bgz       		v0.0.1
 
 TODO
 ----

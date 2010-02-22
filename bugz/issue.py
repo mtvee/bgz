@@ -26,19 +26,23 @@ class Issue(UserDict.UserDict):
         self.comments = {}
         # default keys and values
         self.defaults = {'Id':str(uuid.uuid1()),
-                    'Title':'No Title',
-                    'Date':time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                    'Status':'new',
-                    'Author':'anon',
-                    'Type':'b',
-                    'Description':''}
+                    'Title': 'No Title',
+                    'Date': time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                    'Status': 'new',
+                    'Author': 'anon',
+                    'Type': 'b',
+                    'Description': ''}
         for key in self.defaults.keys():
             self.data[key] = self.defaults[key]
                 
     def __str__( self ):
         """ return a short descriptive string thing """
+        return self.rep()
+
+    def rep( self, dts = None):
+        """ return a short descriptive string thing """
         tmp = self['Id'].split('-')
-        tm = self.time_total()
+        tm = self.time_total(dts)
         ret = "%12s - %s/%s - %2d:%02d - %s" % (tmp[0],self['Type'][0],self['Status'].ljust(6),tm[0],tm[1],self['Title'])
         if len(ret) > 75:
             ret = ret[0:75] + "..."

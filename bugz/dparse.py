@@ -30,6 +30,8 @@ class DateParser:
                 dlim = '.'
             if dt.find('-') != -1:
                 dlim = '-'
+            if dt.find(':') != -1:
+                dlim = ':'
             try:
                 # sortable
                 str = "%%Y%s%%m%s%%d" % (dlim,dlim)
@@ -41,10 +43,29 @@ class DateParser:
                     ret = datetime.datetime.strptime( dt, str )
                 except:
                     try:         
-                        # idiotic american/canadian format
+                        # idiotic american/canadian/sheep format
                         str = "%%m%s%%d%s%%Y" % (dlim,dlim)
                         ret = datetime.datetime.strptime( dt, str )
                     except:
                         pass
         return ret
+        
+# ------------------
+# U N I T  T E S T S
+# ------------------
+import unittest
+
+class DateParseTests(unittest.TestCase):
+    def setUp( self ):
+        pass
+
+    def testSomething( self ):
+        dp = DateParser()
+        tm = dp.parse('2010-02-22')
+        self.assertEquals( "2010-02-22 00:00:00", str(tm) )
+        tm = dp.parse("lw")
+
+if __name__ == '__main__':
+    unittest.main()
+                    
         

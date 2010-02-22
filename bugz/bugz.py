@@ -117,12 +117,18 @@ class Bugz:
             # QnD report
             dts = self._parse_date_range( args[0] )
             files = os.listdir( self.dir_name )
+            s = 'Time Report'
+            s += ' - ' + dts[0].strftime("%Y-%m-%d") + " / " + dts[1].strftime("%Y-%m-%d")
+            print '-' * len(s)
+            print s
+            print '-' * len(s)
             issue = Issue(self.dir_name)
             for file in files:
                 issue.load( file )
                 tm = issue.time_total( dts ) 
                 if tm[0] > 0 or tm[1] > 0:
-                    print issue
+                    print issue.rep( dts )
+                    
             
     def do_edit( self, args ):
         """ edit the issue """
