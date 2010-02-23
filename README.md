@@ -58,11 +58,14 @@ Date ranges can be given to `show` and `time` commands. They look like
 
 `ENDDATE` defaults to now().
 
+understand english ranges like:
+
+- lw | lastw[eek] - one week from a week ago monday
+- t[oday] | n[ow] - from midnight to now
+- y[esterday]     - midnight to midnight
+
 understands dates like:
 
-- lw | lastw[eek]
-- t[oday] | n[ow]
-- y[esterday]
 - YYYY.mm.dd | dd.mm.YYYY | mm.dd.YYYY
 - delim between fields in a date can be ':' | '/' | '-' | '.'
   but if given a range '-' will conflict with delim between start and end dates
@@ -80,4 +83,4 @@ TODO
 - [ ] report output, templates??
 - [-] need better search params for reports
 - [ ] account for windows' path stuff
-- [ ] write some real unit tests once the commands are solidified
+- [-] write some real unit tests once the commands are solidified
