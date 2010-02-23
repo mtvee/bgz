@@ -60,8 +60,8 @@ Date ranges can be given to `show` and `time` commands. They look like
 
 understands dates like:
 
-- lm | lastm[onth] 
 - lw | lastw[eek]
+- t[oday] | n[ow]
 - y[esterday]
 - YYYY.mm.dd | dd.mm.YYYY | mm.dd.YYYY
 - delim between fields in a date can be ':' | '/' | '-' | '.'
@@ -77,10 +77,7 @@ TODO
 ----
 - [ ] easy ties/links to various VCSs?
 - [-] some easy way to keep track of time spent and totals
-- [ ] reporter output for pretty overview (html. excel) for mail/publish
-- [ ] need better search params for reports
-- [ ] fix for windows' path stupidity and user defaults
-- [x] have editor configurable from rc
-- [x] have a ~/.bugzrc file for user info, etc
-- [x] walk up the path to find the .bugz dir, git like
-- [ ] write some real unit tests
+- [ ] report output, templates??
+- [-] need better search params for reports
+- [ ] account for windows' path stuff
+- [ ] write some real unit tests once the commands are solidified

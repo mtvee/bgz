@@ -23,16 +23,16 @@ where OPTIONS are:
   --help            - print this screen
   
 where COMMANDS are:
-  init              - initialize a new db
-  add               - add a new issue
-  status            - get the db status
-  drop [ID]         - drop an issue
-  edit [ID]         - edit an issue
-  comment [ID]      - comment on an issue
-  show [ID|FIELD]   - show an issue. FIELD like s:open OR t:bug
-  open [ID]         - open an issue
-  close [ID]        - close an issue
-  time [add ID|]    - log/show time
+  init                  - initialize a new db
+  add                   - add a new issue
+  status                - get the db status
+  drop [ID]             - drop an issue
+  edit [ID]             - edit an issue
+  comment [ID]          - comment on an issue
+  show [ID|FIELD]       - show an issue. FIELD like s:open OR t:bug
+  open [ID]             - open an issue
+  close [ID]            - close an issue
+  time [add ID|DTRANGE] - log/show time
 '''
 
 
