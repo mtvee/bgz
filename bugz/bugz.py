@@ -63,7 +63,10 @@ class Bugz:
             counts[issue['Status']] += 1
             if not issues.has_key( issue['Type'] ):
                 issues[issue['Type'][0]] = []
-            issues[issue['Type'][0]].append( issue )
+            if next((a for a in args if a == 'all'),None):
+                issues[issue['Type'][0]].append( issue )
+            elif issue['Status'][0] != 'c':
+                issues[issue['Type'][0]].append( issue )
         print 'Status: ',
         for k in counts.keys():
             print k + "/" + str(counts[k]) + " ",
