@@ -137,7 +137,12 @@ class Bugz:
             add a new time entry for the given ID
             
         bgz time DATERANGE
-            reort on time for a DATERANGE
+            report on time for a DATERANGE
+            a DATERANGE can be:
+            lw | [lastw]eek = (Monday - Sunday)
+            [y]esterday     = (midnight - midnight)
+            [t]oday | [n]ow = (midnight - now)
+            DD/MM/YYYY[:DD/MM/YYYY]
         """
         self._check_status()
         if len(args) == 0:
