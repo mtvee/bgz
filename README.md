@@ -33,7 +33,7 @@ Config
 
 Running
 -------
-Bugz is very git like. Here's a quit sample sesh...
+Bugz is very git like. Here's a quick sample sesh...
 
     cd my/cool/project
     bgz init
