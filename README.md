@@ -63,28 +63,7 @@ Commands
 - `open [ID]`         - open an issue
 - `close [ID]`        - close an issue
 - `time [add ID|DR]`  - add time or show by daterange (DR see below)
-
-
-Dates
------
-Date ranges can be given to `show` and `time` commands. They look like
-
-`STARTDATE[-ENDDATE]`
-
-`ENDDATE` defaults to now().
-
-understand english ranges like:
-
-- lw | lastw[eek] - one week from a week ago monday
-- t[oday] | n[ow] - from midnight to now
-- y[esterday]     - midnight to midnight
-
-understands dates like:
-
-- YYYY.mm.dd | dd.mm.YYYY | mm.dd.YYYY
-- delim between fields in a date can be ':' | '/' | '-' | '.'
-  but if given a range '-' will conflict with delim between start and end dates
-
+- `config [global]`   - set some configuration variables
 
 Changes
 -------
