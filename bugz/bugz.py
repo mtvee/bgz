@@ -247,8 +247,8 @@ class Bugz:
                 (b)ug | (t)ask | (f)eature
         """
         self._check_status()
-        if len(args) and args[0] in Issue.types.keys():
-            type = args[0]
+        if len(args) and args[0][0] in Issue.types.keys():
+            type = args[0][0]
         else:
             type = self._read_input( 'Type: (b)ug, (f)eature, (t)ask?', 'b', ('b','t','f'))
         print 'Adding new ' + Issue.types[type].lower()

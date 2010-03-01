@@ -33,6 +33,21 @@ Config
 
 Running
 -------
+Bugz is very git like. Here's a quit sample sesh...
+
+    cd my/cool/project
+    bgz init
+    >> Initialized .bugz
+    bgz add task
+    >> Title: Do something
+    >> Author [me]: 
+    >> Added:     ad6cfa42 - t/new    -  0:00 - Do something
+    bgz status
+    >> Status:  new/1  open/0  closed/0 
+    >> Task
+    >> ----
+    >>    ad6cfa42 - t/new    -  0:00 - Do something
+
 Bugz will walk up the directory tree to find its files so you can run it 
 from anywhere in the tree.
 
