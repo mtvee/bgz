@@ -109,9 +109,13 @@ class Issue(UserDict.UserDict):
         """ load the thing """
         fname = os.path.join(self.dir_name, uid )
         f = open( fname, 'rb' )
-        self.data = pickle.load(f)
-        self.comments = pickle.load(f)
+        try:
+            self.data = pickle.load(f)
+            self.comments = pickle.load(f)
+        except:
+            return False
         f.close()
+        return True
 
 
 # ------------------

@@ -62,7 +62,8 @@ class Bugz:
         issues = {}
         for file in files:
             issue = Issue(self.dir_name)
-            issue.load( file )
+            if not issue.load( file ):
+                continue
             counts[issue['Status']] += 1
             if not issues.has_key( issue['Type'] ):
                 issues[issue['Type'][0]] = []
@@ -166,7 +167,8 @@ class Bugz:
             print '-' * len(s)
             issue = Issue(self.dir_name)
             for file in files:
-                issue.load( file )
+                if not issue.load( file ):
+                    continue
                 tm = issue.time_total( dts ) 
                 if tm[0] > 0 or tm[1] > 0:
                     print issue.rep( dts )
@@ -211,7 +213,8 @@ class Bugz:
         files = os.listdir( self.dir_name )
         issue = Issue(self.dir_name)
         for file in files:
-            issue.load( file )
+            if not issue.load( file ):
+                continue
             if len(args):
                 # check for colon
                 if args[0].find(':') != -1:
@@ -281,6 +284,23 @@ class Bugz:
             print
             print
         
+    def do_config( self, args ):
+        """ create a config file 
+        
+        bgz config [global]
+        """
+        init_file = os.path.join(self.dir_name, '_bugzrc')
+        if len(args) and args[0][0] == 'g':            
+            init_file = os.path.join(os.getenv("HOME"), ".bugzrc")
+        print 'Creating ' + init_file
+        user = self._read_input("Your name: ", os.getenv("USER"))
+        email = self._read_input("Your email: ", user + "@" + os.uname()[1])
+        f = open( init_file, 'w' )
+        f.write("user=" + user + "\n")
+        f.write("email=" + email + "\n")
+        f.close()
+        print "Wrote " + init_file
+        
     # -------------------------
     # protected/private methods
     # -------------------------
@@ -319,7 +339,8 @@ class Bugz:
         flist = self._find_issues( uid )
         if len(flist) == 1:
             iss = Issue(self.dir_name)
-            iss.load( flist[0] )
+            if not iss.load( flist[0] ):
+                return None
             return iss
         elif len(flist) > 1:
             print 'Please be more specific: '
@@ -376,17 +397,11 @@ class Bugz:
         if os.name != 'posix':
             return
         init_file = os.path.join(os.getenv("HOME"), ".bugzrc")
-        if not os.path.exists( init_file ):
-            # this would be annoying to some, perhaps
-            print "Init file not found, creating [%s]..." % init_file
-            user = self._read_input("Your name: ", os.getenv("USER"))
-            email = self._read_input("Your email: ", user + "@" + os.uname()[1])
-            f = open( init_file, 'w' )
-            f.write("user=" + user + "\n")
-            f.write("email=" + email + "\n")
-            f.close()
-            print "Created " + init_file
-        self._read_config( init_file )
+        local_init_file = os.path.join(self.dir_name, "_bugzrc")
+        if os.path.exists( init_file ):
+            self._read_config( init_file )
+        if os.path.exists( local_init_file ):
+            self._read_config( local_init_file )
         
     def _find_bugs_dir( self ):
         """this walks up the path and tries to find the bugs dir"""
