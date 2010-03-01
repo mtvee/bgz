@@ -55,13 +55,26 @@ class Bugz:
         """ get the database status """
         self._check_status()
         files = os.listdir( self.dir_name )
-        issue = Issue(self.dir_name)
         counts = {'new':0,'open':0,'closed':0}
+        issues = {}
         for file in files:
+            issue = Issue(self.dir_name)
             issue.load( file )
             counts[issue['Status']] += 1
-        print 'Status'
-        print counts
+            if not issues.has_key( issue['Type'] ):
+                issues[issue['Type'][0]] = []
+            issues[issue['Type'][0]].append( issue )
+        print 'Status: ',
+        for k in counts.keys():
+            print k + "/" + str(counts[k]) + " ",
+        print
+        types = {'b':'Bug','t':'Task','f':'Feature'}
+        for t in issues.keys():
+            print types[t]
+            print "-" * len(types[t])
+            for issue in issues[t]:
+                print issue
+            print
             
     def do_init( self, args ):
         """ initialize the database """
@@ -213,13 +226,16 @@ class Bugz:
             return True
         return False
         
-    def _find_issues( self, uid ):
+    def _find_issues( self, uid = None ):
         """ find issues like a uid """
         files = os.listdir( self.dir_name )        
         flist = []
         for file in files:
-            if file.startswith(uid):
-                flist.append(file)
+            if uid:
+                if file.startswith(uid):
+                    flist.append(file)
+            else:
+                flist.append( file )
         return flist
         
     def _find_issue( self, uid ):
