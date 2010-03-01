@@ -13,6 +13,7 @@ import pickle
 import uuid
 import UserDict
 
+
 class Issue(UserDict.UserDict):
     """ 
     This is a class to represent an issue of some kind 
@@ -20,6 +21,8 @@ class Issue(UserDict.UserDict):
     - it would be nice if the storage format were human but for now
       pickle is fast and easy.
     """
+    types = {'t':'Task','b':'Bug','f':'Feature'}
+    
     def __init__( self, dname ):
         self.dir_name = dname
         self.data = {}

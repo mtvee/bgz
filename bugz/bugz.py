@@ -16,7 +16,7 @@ import dateparse
 from issue import Issue
 
 class Bugz:
-    """ this is the bugz class that handles the user """
+    """ this is the bugz class that handles the user """    
     def __init__( self ):
         self.dir_name = '.bugz'
         self.editor_cmd = 'vi'
@@ -52,7 +52,10 @@ class Bugz:
             return False
 
     def do_status( self, args ):
-        """ get the database status """
+        """ get the database status 
+        
+        bgz status [all]
+        """
         self._check_status()
         files = os.listdir( self.dir_name )
         counts = {'new':0,'open':0,'closed':0}
@@ -71,16 +74,18 @@ class Bugz:
         for k in counts.keys():
             print k + "/" + str(counts[k]) + " ",
         print
-        types = {'b':'Bug','t':'Task','f':'Feature'}
         for t in issues.keys():
-            print types[t]
-            print "-" * len(types[t])
+            print Issue.types[t]
+            print "-" * len(Issue.types[t])
             for issue in issues[t]:
                 print issue
             print
             
     def do_init( self, args ):
-        """ initialize the database """
+        """ initialize the database 
+        
+        bgz init
+        """
         if os.path.exists( self.dir_name ):
             print 'Database already exists'
             return False
@@ -89,7 +94,10 @@ class Bugz:
         return True
 
     def do_drop( self, args ):
-        """ drop an issue """
+        """ drop an issue 
+        
+        bgz drop ID
+        """
         self._check_status()
         if len(args) == 0:
             return False
@@ -100,14 +108,20 @@ class Bugz:
                 os.unlink(os.path.join(self.dir_name, f))
 
     def do_open( self, args ):
-        """ open an issue """
+        """ open an issue 
+        
+        bgz open ID
+        """
         self._check_status()
         if len(args) == 0:
             return False
         return self._change_status(args[0],'open')
 
     def do_close( self, args ):
-        """ close an issue """
+        """ close an issue 
+        
+        bgz close ID
+        """
         self._check_status()
         if len(args) == 0:
             return False
@@ -117,7 +131,14 @@ class Bugz:
             return False
 
     def do_time( self, args ):
-        """ add or report time """
+        """ add or report time 
+        
+        bgz time add ID
+            add a new time entry for the given ID
+            
+        bgz time DATERANGE
+            reort on time for a DATERANGE
+        """
         self._check_status()
         if len(args) == 0:
             return False
@@ -147,7 +168,10 @@ class Bugz:
                     
             
     def do_edit( self, args ):
-        """ edit the issue """
+        """ edit an issue 
+        
+        bgz edit ID
+        """
         self._check_status()
         if len(args) == 0:
             return False
@@ -159,7 +183,10 @@ class Bugz:
         return False
             
     def do_comment( self, args, prepend = None ):
-        """ add a comment """
+        """ add a comment 
+        
+        bgz comment ID
+        """
         self._check_status()
         if len(args) == 0:
             return False
@@ -204,10 +231,20 @@ class Bugz:
                 print issue
 
     def do_add( self, args ):
-        """ add an issue """
+        """ add an issue 
+        
+        bgz add [type]
+        
+        where type is:
+                (b)ug | (t)ask | (f)eature
+        """
         self._check_status()
+        if len(args) and args[0] in Issue.types.keys():
+            type = args[0]
+        else:
+            type = self._read_input( 'Type: (b)ug, (f)eature, (t)ask?', 'b', ('b','t','f'))
+        print 'Adding new ' + Issue.types[type].lower()
         title = self._read_input('Title')
-        type = self._read_input( 'Type: (b)ug, (f)eature, (t)ask?', 'b', ('b','t','f'))
         author = self._read_input('Author',self.user_id)
         #desc = self._read_multiline('Descr')
         desc = self._external_edit('\n\n### ' + title )
@@ -220,6 +257,28 @@ class Bugz:
         issue.save()        
         print 'Added: ' + str(issue)
         
+    def do_help( self, args ):
+        """ show help
+        
+        bgz help [command]
+        """
+        try:
+            func = getattr(self,'do_' + args[0] )
+            print func.__doc__
+        except Exception, e:
+            m = dir( self )
+            print 'Available Commands (type help [command] for more info)'
+            print
+            for cmd in m:
+                if cmd.startswith('do_'):
+                    func = getattr(self, cmd)
+                    print "%20s - %s" % (cmd[3:], func.__doc__.split("\n")[0])
+            print
+            print
+        
+    # -------------------------
+    # protected/private methods
+    # -------------------------
     def _change_status( self, uid, status ):
         """ change the status on an issue """
         iss = self._find_issue(uid)
