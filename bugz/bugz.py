@@ -108,6 +108,23 @@ class Bugz:
             if yn == 'y':
                 os.unlink(os.path.join(self.dir_name, f))
 
+    def do_purge( self, args ):
+        """ delete closed issues forever
+        
+        bgz purge
+        """
+        self._check_status()
+        yn = self._read_input('Really purge closed issues? This will delete them forever', 'n', ['y','n'])
+        if yn != 'y':
+            return
+        for file in os.listdir( self.dir_name ):
+            issue = Issue(self.dir_name)
+            if not issue.load( file ):
+                continue
+            if issue['Status'][0] == 'c':
+                os.unlink( os.path.join(self.dir_name, file ))
+                print 'purged: ' + issue['Id']
+
     def do_open( self, args ):
         """ open an issue 
         
