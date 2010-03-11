@@ -108,13 +108,13 @@ class Issue(UserDict.UserDict):
     def load( self, uid ):
         """ load the thing """
         fname = os.path.join(self.dir_name, uid )
-        f = open( fname, 'rb' )
         try:
+            f = open( fname, 'rb' )
             self.data = pickle.load(f)
             self.comments = pickle.load(f)
+            f.close()
         except:
             return False
-        f.close()
         return True
 
 

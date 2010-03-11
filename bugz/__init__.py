@@ -32,7 +32,7 @@
 # under either the MPL or the GPL License.
 # ------------------------------------------------------------------------
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 __author__ = "J. Knight <emptyvee@gmail.com>"
 __license__ = "Mozilla Public License (MPL) 1.1"
 __url__ = 'http://github.com/mtvee/bgz'

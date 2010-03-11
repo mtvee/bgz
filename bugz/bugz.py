@@ -12,6 +12,7 @@ import tempfile
 import re
 import datetime
 import dateparse
+import shutil
 
 from issue import Issue
 
@@ -88,7 +89,7 @@ class Bugz:
         bgz init
         """
         if os.path.exists( self.dir_name ):
-            print 'Database already exists'
+            print 'abort: repository already exists'
             return False
         os.mkdir( self.dir_name )
         print 'Initialized ' + self.dir_name
@@ -109,22 +110,24 @@ class Bugz:
                 os.unlink(os.path.join(self.dir_name, f))
 
     def do_purge( self, args ):
-        """ delete closed issues forever
+        """move closed issues to purged directory
         
         bgz purge
         """
         self._check_status()
-        yn = self._read_input('Really purge closed issues? This will delete them forever', 'n', ['y','n'])
-        if yn != 'y':
-            return
+        ppath = os.path.join(self.dir_name, 'purged')
+        if not os.path.exists( ppath ):
+            os.mkdir( ppath )
+        count = 0
         for file in os.listdir( self.dir_name ):
             issue = Issue(self.dir_name)
             if not issue.load( file ):
                 continue
             if issue['Status'][0] == 'c':
-                os.unlink( os.path.join(self.dir_name, file ))
-                print 'purged: ' + issue['Id']
-
+                shutil.move(os.path.join(self.dir_name,file), ppath)
+                count += 1
+        print 'purged %d issue(s)' % (count)
+                    
     def do_open( self, args ):
         """ open an issue 
         
@@ -431,9 +434,9 @@ class Bugz:
         return False
 
     def _check_status( self ):
-        """ make sure we have a database to work with """
+        """ make sure we have a data dir to work with """
         if not os.path.exists( self.dir_name ):
-            print 'Database not found: ' + self.dir_name
+            print 'abort: No bugz repository found (%s)' %  self.dir_name
             sys.exit( 1 )
                 
     def _read_config( self, conf ):
