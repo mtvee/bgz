@@ -110,14 +110,18 @@ class Bugz:
                 os.unlink(os.path.join(self.dir_name, f))
 
     def do_purge( self, args ):
-        """move closed issues to purged directory
+        """move closed issues to 'PROJECT/.bugz/purged' directory
         
         bgz purge
         """
         self._check_status()
         ppath = os.path.join(self.dir_name, 'purged')
         if not os.path.exists( ppath ):
-            os.mkdir( ppath )
+            try:
+                os.mkdir( ppath )
+            except:
+                print 'abort: unable to create ' + ppath
+                sys.exit(2)
         count = 0
         for file in os.listdir( self.dir_name ):
             issue = Issue(self.dir_name)

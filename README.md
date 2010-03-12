@@ -1,6 +1,6 @@
-_\o/_   Bugz 
-/(_)\   v0.0.3
-==============
+    _\o/_   Bugz 
+    /(_)\   v0.0.3
+
 Bugz is a simple command line bug tracking tool written in python. It uses
 ascii text files (actually pickles at the moment) to keep a database of 
 bugs so it can live in the source tree of the project and become part of 
@@ -24,15 +24,16 @@ possibly figure out the rest. Reading the source may help or hinder.
 Config
 ------
 ~/.bugzrc
+
 PROJECT/.bugz/_bugzrc
 
----[snip]---
+    ---[snip]---
     # comment
     ; another comment
     user=your name
     email=me@someplace.com
     editor=mate -w
----[snip]---
+    ---[snip]---
 
 Running
 -------
@@ -71,7 +72,7 @@ Commands
 
 Changes
 -------
-- 2010-03-11 - better reporting, config system							  v0.0.3
+- 2010-03-11 - better reporting, config system, purge				  v0.0.3
 - 2010-02-22 - basic handling of assoc time with an issue  		v0.0.2
 - 2010-02-18 - pushed to http://github.com/mtvee/bgz       		v0.0.1
 

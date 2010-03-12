@@ -11,10 +11,10 @@
 # License for the specific language governing rights and limitations
 # under the License.
 #
-# The Original Code is 'bugz'.
+# The Original Code is 'bugz', 'http://github.com/mtvee/bgz'.
 #
 # The Initial Developer of the Original Code is J. Knight.
-# Portions created by J.Knight are Copyright (C) 2010
+# Portions created by J.Knight are Copyright (c) 2010
 # All Rights Reserved.
 #
 # Contributor(s): 
@@ -30,6 +30,7 @@
 # other provisions required by the GPL License. If you do not delete
 # the provisions above, a recipient may use your version of this file
 # under either the MPL or the GPL License.
+#
 # ------------------------------------------------------------------------
 
 __version__ = "0.0.3"

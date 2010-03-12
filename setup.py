@@ -24,7 +24,7 @@ setup( name = 'bugz',
       url = 'http://j2mfk.com/projects/bugz/',
       packages = ['bugz'],
       scripts = ['bgz'],
-      long_description = """A simple commandline bug tracker that lives in
+      long_description = """A simple command line bug tracker that lives in
       the project root and gets versioned along with the source.
       """,
       # cheeseshop stuff
