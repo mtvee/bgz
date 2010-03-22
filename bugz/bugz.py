@@ -164,7 +164,8 @@ class Bugz:
         bgz time DATERANGE
             report on time for a DATERANGE
             a DATERANGE can be:
-            lw | [lastw]eek = (Monday - Sunday)
+            tw | [thisw]eek = this week (Monday - Sunday)
+            lw | [lastw]eek = last week (Monday - Sunday)
             [y]esterday     = (midnight - midnight)
             [t]oday | [n]ow = (midnight - now)
             DD/MM/YYYY[:DD/MM/YYYY]

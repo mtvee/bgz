@@ -25,6 +25,11 @@ class DateParser:
                 now = datetime.datetime.now()
                 sdate = now - datetime.timedelta(days=now.weekday(), weeks=1)
                 edate = sdate + datetime.timedelta(7)
+            elif dts[0].startswith('thisw') or dts[0].startswith('tw'):
+                # this [w]eek, starting monday of
+                now = datetime.datetime.now()
+                sdate = now - datetime.timedelta(days=now.weekday())
+                edate = now
             elif dts[0].startswith('y'):
                 # y[esterday]
                 sdate = datetime.datetime.now() - datetime.timedelta(1)
