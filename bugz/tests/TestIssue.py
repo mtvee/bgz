@@ -5,9 +5,9 @@ import sys, os
 sys.path.append(os.curdir + "/../../")
 # -=-
 
-from bugz.bugz import Bugz
+from bugz.issue import Issue
 
-class testBugz( unittest.TestCase ):
+class testIssue( unittest.TestCase ):
     def setUp(self):
         pass
 
