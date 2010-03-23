@@ -24,17 +24,19 @@ class DateParser:
                 # lastweek, starting monday before last
                 now = datetime.datetime.now()
                 sdate = now - datetime.timedelta(days=now.weekday(), weeks=1)
-                edate = sdate + datetime.timedelta(7)
+                sdate = sdate.replace(hour=0,minute=0,second=0,microsecond=0)
+                edate = sdate + datetime.timedelta(7) - datetime.timedelta(seconds=1)
             elif dts[0].startswith('thisw') or dts[0].startswith('tw'):
                 # this [w]eek, starting monday of
                 now = datetime.datetime.now()
                 sdate = now - datetime.timedelta(days=now.weekday())
+                sdate = sdate.replace(hour=0,minute=0,second=0,microsecond=0)
                 edate = now
             elif dts[0].startswith('y'):
                 # y[esterday]
                 sdate = datetime.datetime.now() - datetime.timedelta(1)
                 sdate = sdate.replace(hour=0,minute=0,second=0,microsecond=0)
-                edate = sdate + datetime.timedelta(1)
+                edate = sdate + datetime.timedelta(1) - datetime.timedelta(seconds=1)
             elif dts[0].startswith('t') or dts[0].startswith('n'):
                 # t[oday]
                 sdate = datetime.datetime.now()
