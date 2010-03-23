@@ -10,6 +10,6 @@ from bugz.dateparse import DateParser
 
 def test_simple():
     dp = DateParser()
-    tm = dp.parse('2010-02-22')
+    tm = dp.parse_date('2010-02-22')
     assert "2010-02-22 00:00:00" == str(tm) 
     
