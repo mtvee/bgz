@@ -158,6 +158,9 @@ class Bugz:
     def do_time( self, args ):
         """ add or report time 
         
+        bgz time
+            report on time for this week (Monday - Sunday)
+            
         bgz time add ID
             add a new time entry for the given ID
             
@@ -172,7 +175,7 @@ class Bugz:
         """
         self._check_status()
         if len(args) == 0:
-            return False
+            args.append("thisweek")
         if args[0] == 'add':
             if len(args) < 2:
                 return False
