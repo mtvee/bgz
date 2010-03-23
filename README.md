@@ -1,5 +1,5 @@
     _\o/_   Bugz 
-    /(_)\   v0.0.3
+    /(_)\   v0.1.0
 
 Bugz is a simple command line bug tracking tool written in python. It uses
 ascii text files (actually pickles at the moment) to keep a database of 
@@ -58,9 +58,9 @@ from anywhere in the tree.
 Commands
 --------
 - `init`              - initialize a new db
-- `add`               - add a new issue
+- `add`               - add a new issue or project
 - `status`            - get the db status
-- `drop [ID]`         - drop an issue
+- `drop [ID]`         - drop an issue or project
 - `edit [ID]`         - edit an issue
 - `comment [ID]`      - comment on an issue
 - `show [ID|FIELD]`   - show an issue. FIELD like s:open OR t:bug
@@ -72,9 +72,10 @@ Commands
 
 Changes
 -------
-- 2010-03-11 - better reporting, config system, purge				  v0.0.3
-- 2010-02-22 - basic handling of assoc time with an issue  		v0.0.2
-- 2010-02-18 - pushed to http://github.com/mtvee/bgz       		v0.0.1
+- 2010-03-23 - report time across projects                              v0.1.0
+- 2010-03-11 - better reporting, config system, purge                   v0.0.3
+- 2010-02-22 - basic handling of assoc time with an issue               v0.0.2
+- 2010-02-18 - pushed to http://github.com/mtvee/bgz                    v0.0.1
 
 TODO
 ----
