@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# encoding: utf-8
+# encoding: utf-8 
 """
 bgz
 http://github.com/mtvee/bgz
@@ -13,7 +13,6 @@ import getopt
 
 from bugz.bugz import Bugz
 
-
 help_message = '''
 A simple command line issue tracking tool to keep issues in the file 
 system, with the project and in the repository.
@@ -25,7 +24,6 @@ where OPTIONS are:
 COMMANDS are:  
     bgz help        - for more info
 '''
-
 
 class Usage(Exception):
     def __init__(self, msg):
@@ -56,6 +54,8 @@ def main(argv=None):
         print >> sys.stderr, sys.argv[0].split("/")[-1] + ": " + str(err.msg)
         return 2
 
-
+# ---------
+# M A I N
+# ---------
 if __name__ == "__main__":
     sys.exit(main())
