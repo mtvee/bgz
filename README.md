@@ -8,7 +8,7 @@ the versioning system.
 
 Installing
 ----------
-Unfold the archive or checkout the source tree and type:
+Unfold the archive or checkout the source tree and:
 
 `$> sudo python setup.py install`
 
@@ -21,23 +21,9 @@ and run it in place.
 Now you can run `bgz --help` from the root of your source tree and 
 possibly figure out the rest. Reading the source may help or hinder.
 
-Config
-------
-~/.bugzrc
-
-PROJECT/.bugz/_bugzrc
-
-    ---[snip]---
-    # comment
-    ; another comment
-    user=your name
-    email=me@someplace.com
-    editor=mate -w
-    ---[snip]---
-
 Running
 -------
-Bugz is very git like. Here's a quick sample sesh...
+Bugz is git like. Here's a quick sample sesh...
 
     cd my/cool/project
     bgz init
@@ -66,9 +52,54 @@ Commands
 - `show [ID|FIELD]`   - show an issue. FIELD like s:open OR t:bug
 - `open [ID]`         - open an issue
 - `close [ID]`        - close an issue
-- `time [add ID|DR]`  - add time or show by daterange (DR see below)
+- `time [add ID|DR]`  - add time or show by daterange (DR see `Dates` below)
 - `config [global]`   - set some configuration variables
 - `purge`             - move closed issues to a purged directory
+
+Filtering
+---------
+You can filter the `show` command using `field:criteria`. Current the filterable
+fields are [s]tatus, [t]ype or [d]ate.
+
+e.g.
+
+    s:o
+    status:o
+    status:open
+    type:task
+
+Dates
+-----
+Dates can be input as a range. See `help time` for a list of date range syntax.
+These work also for the `show` command.
+
+    tw | [thisw]eek = this week (Monday - Sunday)
+    lw | [lastw]eek = last week (Monday - Sunday)
+    [y]esterday     = (midnight - midnight)
+    [t]oday | [n]ow = (midnight - now)
+    DD/MM/YYYY[:DD/MM/YYYY]
+
+
+Projects
+--------
+Bugz can keep track of projects you are working on and report logged time 
+across those projects. From the working area of a project you can `add` or 
+`drop` the project. The `time` command will report across all currently
+active projects.
+
+Config
+------
+~/.bugzrc
+
+PROJECT/.bugz/_bugzrc
+
+    ---[snip]---
+    # comment
+    ; another comment
+    user=your name
+    email=me@someplace.com
+    editor=mate -w
+    ---[snip]---
 
 Changes
 -------

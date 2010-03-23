@@ -276,13 +276,16 @@ class Bugz:
                         tmp = arg.split(':')
                         if tmp[0][0] == 's' and issue['Status'][0] == tmp[1][0]:
                             print issue
+                            break
                         elif tmp[0][0] == 't' and issue['Type'][0] == tmp[1][0]:
                             print issue
+                            break
                         elif tmp[0][0] == 'd':
                             # date range
                             dts = dateparse.DateParser().parse_date_range( tmp[1] )
                             if issue.date() >= dts[0] and issue.date() <= dts[1]:
                                 print issue
+                                break
                 else:
                     if args[0][0] == '/':
                       if issue['Title'].find(args[0][1:]) != -1:
