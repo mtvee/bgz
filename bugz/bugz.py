@@ -17,16 +17,24 @@ import shutil
 from issue import Issue
 
 class Bugz:
+    # the global rc file name
+    BGZRC_GLOBAL = ".bugzrc"
+    # the local rc file name
+    BGZRC_LOCAL = "_bgzrc"
+    # the global projects file
+    BGZRC_PROJS = ".bgzprojs"
+    # the bugz folder name
+    BGZ_DIR = '.bugz'
+    
     """ this is the bugz class that handles the user """    
     def __init__( self ):
-        self.dir_name = '.bugz'
         self.editor_cmd = 'vi'
         self.user_id = os.environ['USER']
         self.user_name = self.user_id
         self._read_init()
         if self._find_bugs_dir():
             # try for a local config file            
-            lconf = os.path.join(self.dir_name, 'config')
+            lconf = os.path.join(self.BGZ_DIR, 'config')
             if os.path.exists(lconf):
                 self._read_config( lconf )
         try:
@@ -58,11 +66,11 @@ class Bugz:
         bgz status [all]
         """
         self._check_status()
-        files = os.listdir( self.dir_name )
+        files = os.listdir( self.BGZ_DIR )
         counts = {'new':0,'open':0,'closed':0}
         issues = {}
         for file in files:
-            issue = Issue(self.dir_name)
+            issue = Issue(self.BGZ_DIR)
             if not issue.load( file ):
                 continue
             counts[issue['Status']] += 1
@@ -88,26 +96,31 @@ class Bugz:
         
         bgz init
         """
-        if os.path.exists( self.dir_name ):
+        if os.path.exists( self.BGZ_DIR ):
             print 'abort: repository already exists'
             return False
-        os.mkdir( self.dir_name )
-        print 'Initialized ' + self.dir_name
+        os.mkdir( self.BGZ_DIR )
+        print 'Initialized ' + self.BGZ_DIR
         return True
 
     def do_drop( self, args ):
-        """ drop an issue 
+        """ drop an issue or project
         
         bgz drop ID
+        bgz drop [p]roject
         """
         self._check_status()
         if len(args) == 0:
             return False
+        # drop a project
+        if args[0][0] == 'p':
+            self._remove_project(self.BGZ_DIR)
+            return
         flist = self._find_issues(args[0])
         for f in flist:
             yn = self._read_input('Really drop ' + f, 'n', ['y','n'])
             if yn == 'y':
-                os.unlink(os.path.join(self.dir_name, f))
+                os.unlink(os.path.join(self.BGZ_DIR, f))
 
     def do_purge( self, args ):
         """move closed issues to 'PROJECT/.bugz/purged' directory
@@ -115,7 +128,7 @@ class Bugz:
         bgz purge
         """
         self._check_status()
-        ppath = os.path.join(self.dir_name, 'purged')
+        ppath = os.path.join(self.BGZ_DIR, 'purged')
         if not os.path.exists( ppath ):
             try:
                 os.mkdir( ppath )
@@ -123,12 +136,12 @@ class Bugz:
                 print 'abort: unable to create ' + ppath
                 sys.exit(2)
         count = 0
-        for file in os.listdir( self.dir_name ):
-            issue = Issue(self.dir_name)
+        for file in os.listdir( self.BGZ_DIR ):
+            issue = Issue(self.BGZ_DIR)
             if not issue.load( file ):
                 continue
             if issue['Status'][0] == 'c':
-                shutil.move(os.path.join(self.dir_name,file), ppath)
+                shutil.move(os.path.join(self.BGZ_DIR,file), ppath)
                 count += 1
         print 'purged %d issue(s)' % (count)
                     
@@ -187,20 +200,33 @@ class Bugz:
         else:
             # QnD report
             dts = dateparse.DateParser().parse_date_range( args[0] )
-            files = os.listdir( self.dir_name )
             s = 'Time Report'
             s += ' - ' + dts[0].strftime("%Y-%m-%d") + " / " + dts[1].strftime("%Y-%m-%d")
             print '-' * len(s)
             print s
             print '-' * len(s)
-            issue = Issue(self.dir_name)
-            for file in files:
-                if not issue.load( file ):
-                    continue
-                tm = issue.time_total( dts ) 
-                if tm[0] > 0 or tm[1] > 0:
-                    print issue.rep( dts )
-                    
+            projects = self._read_projects()
+            gtotal = [0,0]
+            for proj in projects:
+                puthdr = True
+                issue = Issue( proj )
+                files = os.listdir( proj )
+                for file in files:
+                    if not issue.load( file ):
+                        continue
+                    tm = issue.time_total( dts ) 
+                    if tm[0] > 0 or tm[1] > 0:
+                        gtotal[0] += tm[0]
+                        gtotal[1] += tm[1]
+                        if puthdr:
+                            print 'Project: ' + proj[:-(len(proj)-proj.rfind('.'))]
+                            puthdr = False
+                        print issue.rep( dts )
+            gtotal[0] += gtotal[1]/60
+            gtotal[1] = gtotal[1] % 60
+            t = 'Total: %d:%02d'  % (gtotal[0],gtotal[1])
+            print '=' * len(t)
+            print t
             
     def do_edit( self, args ):
         """ edit an issue 
@@ -238,8 +264,8 @@ class Bugz:
     def do_show( self, args ):
         """ show stuff """
         self._check_status()
-        files = os.listdir( self.dir_name )
-        issue = Issue(self.dir_name)
+        files = os.listdir( self.BGZ_DIR )
+        issue = Issue(self.BGZ_DIR)
         for file in files:
             if not issue.load( file ):
                 continue
@@ -275,17 +301,20 @@ class Bugz:
                 (b)ug | (t)ask | (f)eature
         """
         self._check_status()
-        if len(args) and args[0][0] in Issue.types.keys():
+        if len(args) and args[0][0] in Issue.types.keys() or args[0][0] == 'p':
             type = args[0][0]
         else:
-            type = self._read_input( 'Type: (b)ug, (f)eature, (t)ask?', 'b', ('b','t','f'))
+            type = self._read_input( 'Type: (b)ug, (f)eature, (t)ask | (p)roject?', 'b', ('b','t','f','p'))
+        if type =='p':
+            self._add_project( self.BGZ_DIR )
+            return
         print 'Adding new ' + Issue.types[type].lower()
         title = self._read_input('Title')
         author = self._read_input('Author',self.user_id)
         #desc = self._read_multiline('Descr')
         desc = self._external_edit('\n\n### ' + title )
         
-        issue = Issue( self.dir_name )
+        issue = Issue( self.BGZ_DIR )
         issue['Title'] = title
         issue['Description'] = desc
         issue['Type'] = type
@@ -317,9 +346,9 @@ class Bugz:
         
         bgz config [global]
         """
-        init_file = os.path.join(self.dir_name, '_bugzrc')
+        init_file = os.path.join(self.BGZ_DIR, self.BGZRC_LOCAL)
         if len(args) and args[0][0] == 'g':            
-            init_file = os.path.join(os.getenv("HOME"), ".bugzrc")
+            init_file = os.path.join(os.getenv("HOME"), self.BGZRC_GLOBAL)
         print 'Creating ' + init_file
         user = self._read_input("Your name: ", os.getenv("USER"))
         email = self._read_input("Your email: ", user + "@" + os.uname()[1])
@@ -343,7 +372,7 @@ class Bugz:
         
     def _find_issues( self, uid = None ):
         """ find issues like a uid """
-        files = os.listdir( self.dir_name )        
+        files = os.listdir( self.BGZ_DIR )        
         flist = []
         for file in files:
             if uid:
@@ -356,8 +385,8 @@ class Bugz:
     def _find_issue( self, uid ):
         """ find an issue with a partial uid """
         if uid.startswith('g'):
-            if not os.path.exists(os.path.join(self.dir_name,'general.' + self.user_name)):
-                gen = Issue(self.dir_name)
+            if not os.path.exists(os.path.join(self.BGZ_DIR,'general.' + self.user_name)):
+                gen = Issue(self.BGZ_DIR)
                 gen['Id'] = 'general.' + self.user_name
                 gen['Title'] = 'General Project Catchall'
                 gen['Author'] = self.user_id
@@ -366,7 +395,7 @@ class Bugz:
                 gen.save()
         flist = self._find_issues( uid )
         if len(flist) == 1:
-            iss = Issue(self.dir_name)
+            iss = Issue(self.BGZ_DIR)
             if not iss.load( flist[0] ):
                 return None
             return iss
@@ -420,12 +449,15 @@ class Bugz:
                     lines.append(line)
         return "".join(lines).rstrip()
 
+    def _home_dir( self ):
+        """ return path to the users home folder """
+        # return os.path.expanduser('~') <- does this work in Win??
+        return os.getenv("USERPROFILE") or os.getenv("HOMEPATH") or os.getenv("HOME") or '.'
+        
     def _read_init( self ):
         """ try and find the init file and read it """
-        if os.name != 'posix':
-            return
-        init_file = os.path.join(os.getenv("HOME"), ".bugzrc")
-        local_init_file = os.path.join(self.dir_name, "_bugzrc")
+        init_file = os.path.join(self._home_dir(), self.BGZRC_GLOBAL)
+        local_init_file = os.path.join(self.BGZ_DIR, self.BGZRC_LOCAL)
         if os.path.exists( init_file ):
             self._read_config( init_file )
         if os.path.exists( local_init_file ):
@@ -435,18 +467,61 @@ class Bugz:
         """this walks up the path and tries to find the bugs dir"""
         curpath = os.path.abspath(os.curdir)
         while len(curpath):
-            if os.path.exists(os.path.join(curpath, self.dir_name)):
-                self.dir_name = os.path.join(curpath, self.dir_name)
+            if os.path.exists(os.path.join(curpath, self.BGZ_DIR)):
+                self.BGZ_DIR = os.path.join(curpath, self.BGZ_DIR)
                 return True
             curpath = curpath[0:curpath.rfind('/')]
         return False
 
     def _check_status( self ):
         """ make sure we have a data dir to work with """
-        if not os.path.exists( self.dir_name ):
-            print 'abort: No bugz repository found (%s)' %  self.dir_name
+        if not os.path.exists( self.BGZ_DIR ):
+            print 'abort: No bugz repository found (%s)' %  self.BGZ_DIR
             sys.exit( 1 )
                 
+    def _read_projects( self ):
+        """ read in the projects list, if any """
+        projects = [self.BGZ_DIR]
+        proj_file = os.path.join(self._home_dir(), self.BGZRC_PROJS)
+        if os.path.exists( proj_file ):
+            projects = open( proj_file ).read().splitlines()
+        return projects
+    
+    def _save_projects( self, projects ):
+        """ save a list of project directories """
+        proj_file = os.path.join(self._home_dir(), self.BGZRC_PROJS)
+        try:
+            f = open( proj_file, 'w' )
+            for proj in projects:
+                f.write( proj + "\n" )
+            f.close()
+        except Exception, e:
+            print e
+        
+    def _add_project( self, proj_path ):
+        """ add a project to the project path list """
+        ppath = os.path.expanduser( proj_path )
+        ppath = os.path.abspath( ppath )
+        projects = self._read_projects()
+        for proj in projects:
+            if ppath == proj:
+                print 'Project exists: ' + ppath
+                return
+        projects.append( ppath )
+        print 'Added project: ' + ppath
+        self._save_projects( projects )
+        
+    def _remove_project( self, proj_path ):
+        """ remove a project from the project path list """
+        ppath = os.path.expanduser( proj_path )
+        ppath = os.path.abspath( ppath )
+        projects = self._read_projects()
+        for proj in projects:
+            if ppath == proj:
+                projects.remove( ppath )
+                print 'Dropped project: ' + ppath
+        self._save_projects( projects )
+        
     def _read_config( self, conf ):
         """ read in a config file """
         f = open( conf, 'r' )
