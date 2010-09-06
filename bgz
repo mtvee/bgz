@@ -12,6 +12,7 @@ import sys
 import getopt
 import UserDict
 
+import bugz        
 from bugz.bugz import Bugz
 
 help_message = '''
@@ -28,7 +29,9 @@ COMMANDS are:
 
 class Usage(Exception):
     def __init__(self, msg):
-        self.msg = msg
+        self.msg = os.path.basename(sys.argv[0]) + " v" + bugz.__version__ 
+        self.msg = self.msg + bugz.__copyright__ + ' ' + bugz.__author__
+        self.msg = self.msg + "\n" + msg
 
 def main(argv=None):
   
@@ -56,12 +59,12 @@ def main(argv=None):
             if option in ("-o", "--output"):
                 output = value
             if option in ("-V", "--version"):
-                import bugz
                 print os.path.basename(sys.argv[0]) + " v" + bugz.__version__,
                 print bugz.__copyright__ + ' ' + bugz.__author__
                 print bugz.__url__
                 sys.exit( 0 )
 
+                
         b = Bugz( opts )
         b.run( args )
         

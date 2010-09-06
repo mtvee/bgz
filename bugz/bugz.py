@@ -125,7 +125,7 @@ class Bugz:
                 os.unlink(os.path.join(self.BGZ_DIR, f))
 
     def do_purge( self, args ):
-        """move closed issues to 'PROJECT/.bugz/purged' directory
+        """ move closed issues to 'PROJECT/.bugz/purged' directory
         
         bgz purge
         """
@@ -264,38 +264,52 @@ class Bugz:
         return False
 
     def do_show( self, args ):
-        """ show stuff """
+        """ show stuff 
+        
+        bgz show [partial_UUID]
+        bgz show [a:author] [s:status] [ty:type] [ti:title] [d:date_range] 
+        bgz show / TITLE
+        """
         self._check_status()
         files = os.listdir( self.BGZ_DIR )
         issue = Issue(self.BGZ_DIR)
         for file in files:
             if not issue.load( file ):
                 continue
-            if len(args):
-                # check for colon
-                if args[0].find(':') != -1:
-                    for arg in args:
-                        tmp = arg.split(':')
-                        if tmp[0][0] == 's' and issue['Status'][0] == tmp[1][0]:
+            if len(args) and args[0].find(':') != -1:
+                hitcount = 0
+                for arg in args:
+                    tmp = arg.split(':')
+                    if tmp[0].startswith('s'): 
+                        if issue['Status'][0] == tmp[1][0]:
                             print issue
-                            break
-                        elif tmp[0][0] == 't' and issue['Type'][0] == tmp[1][0]:
+                        break
+                    elif tmp[0].startswith('ty'):
+                        if issue['Type'][0] == tmp[1][0]:
                             print issue
-                            break
-                        elif tmp[0][0] == 'd':
-                            # date range
-                            dts = dateparse.DateParser().parse_date_range( tmp[1] )
-                            if issue.date() >= dts[0] and issue.date() <= dts[1]:
-                                print issue
-                                break
-                else:
-                    if args[0][0] == '/':
-                      if issue['Title'].find(args[0][1:]) != -1:
-                          print issue  
-                    elif file.startswith( args[0] ):
-                        issue.show()
+                        break
+                    elif tmp[0].startswith('ti'):
+                        if issue['Title'].find( tmp[1] ) != -1:
+                            print issue
+                        break
+                    elif tmp[0].startswith('a'):
+                        if issue['Author'].find( tmp[1] ) != -1:
+                            print issue
+                        break
+                    elif tmp[0].startswith('d'):
+                        # date range
+                        dts = dateparse.DateParser().parse_date_range( tmp[1] )
+                        if issue.date() >= dts[0] and issue.date() <= dts[1]:
+                            print issue
+                        break
+                    else:
+                        print "Unknown qualifier: " + tmp[0]
+                        break
             else:
-                print issue
+                if file.startswith( args[0] ):
+                    issue.show()
+            #else:
+            #    print issue
 
     def do_add( self, args ):
         """ add an issue 
