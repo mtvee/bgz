@@ -34,7 +34,8 @@
 #
 # ------------------------------------------------------------------------
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __author__ = "J. Knight <emptyvee@gmail.com>"
+__copyright__ = '(c) 2010'
 __license__ = "Mozilla Public License (MPL) 1.1"
 __url__ = 'http://github.com/mtvee/bgz'

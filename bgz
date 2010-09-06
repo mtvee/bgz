@@ -40,7 +40,7 @@ def main(argv=None):
         argv = sys.argv
     try:
         try:
-            opts, args = getopt.getopt(argv[1:], "dho:v", ["debug","help", "output=","verbose"])
+            opts, args = getopt.getopt(argv[1:], "dho:vV", ["debug","help", "output=","verbose","version"])
         except getopt.error, msg:
             raise Usage(msg)
 
@@ -55,6 +55,12 @@ def main(argv=None):
                 raise Usage(help_message)
             if option in ("-o", "--output"):
                 output = value
+            if option in ("-V", "--version"):
+                import bugz
+                print os.path.basename(sys.argv[0]) + " v" + bugz.__version__,
+                print bugz.__copyright__ + ' ' + bugz.__author__
+                print bugz.__url__
+                sys.exit( 0 )
 
         b = Bugz( opts )
         b.run( args )

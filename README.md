@@ -1,5 +1,5 @@
     _\o/_   Bugz 
-    /(_)\   v0.1.0
+    /(_)\   v0.2.0
 
 Bugz is a simple command line bug tracking tool written in python. It uses
 ascii text files (actually pickles at the moment) to keep a database of 
