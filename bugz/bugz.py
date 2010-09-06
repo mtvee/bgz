@@ -282,31 +282,30 @@ class Bugz:
                     tmp = arg.split(':')
                     if tmp[0].startswith('s'): 
                         if issue['Status'][0] == tmp[1][0]:
-                            hitcount  = hitcount + 1
+                            hitcount = hitcount + 1
                     elif tmp[0].startswith('ty'):
                         if issue['Type'][0] == tmp[1][0]:
-                            hitcount  = hitcount + 1
+                            hitcount = hitcount + 1
                     elif tmp[0].startswith('ti'):
                         if issue['Title'].find( tmp[1] ) != -1:
-                            hitcount  = hitcount + 1
+                            hitcount = hitcount + 1
                     elif tmp[0].startswith('a'):
                         if issue['Author'].find( tmp[1] ) != -1:
-                            hitcount  = hitcount + 1
+                            hitcount = hitcount + 1
                     elif tmp[0].startswith('d'):
                         # date range
                         dts = dateparse.DateParser().parse_date_range( tmp[1] )
                         if issue.date() >= dts[0] and issue.date() <= dts[1]:
-                            hitcount  = hitcount + 1
+                            hitcount = hitcount + 1
                     else:
-                        print "Unknown qualifier: " + tmp[0]                
+                        print "Unknown qualifier: " + tmp[0]
+                # if all the args hit, then print it
                 if hitcount == len( args ):
                     print issue
                 
             else:
                 if file.startswith( args[0] ):
                     issue.show()
-            #else:
-            #    print issue
 
     def do_add( self, args ):
         """ add an issue 

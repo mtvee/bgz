@@ -103,6 +103,8 @@ PROJECT/.bugz/_bugzrc
 
 Changes
 -------
+- 2010-09-07 - better searching with 'show'                             v0.2.1
+             - switched to XML format
 - 2010-03-23 - report time across projects                              v0.1.0
 - 2010-03-11 - better reporting, config system, purge                   v0.0.3
 - 2010-02-22 - basic handling of assoc time with an issue               v0.0.2
@@ -112,7 +114,7 @@ TODO
 ----
 - [ ] facilitate issue merging for conflicts (xml format will easier)
 - [ ] report output, templates, xml, json??
-- [-] automatic conversion from pickle style repo to xml
+- [x] automatic conversion from pickle style repo to xml
 - [x] save/load to xml
 - [-] need better search params for reports
 - [-] account for windows' path stuff
