@@ -1,4 +1,4 @@
-# -*- Mode: python; tab-width: 2; indent-tabs-mode: nil; encoding: utf-8 -*-
+# -*- Mode: python; tab-width: 4; indent-tabs-mode: nil; encoding: utf-8 -*-
 """
 bgz
 http://github.com/mtvee/bgz
@@ -11,15 +11,13 @@ import time
 import datetime
 import uuid
 import UserDict
+# storage
 import pickle
 from xml.dom import minidom
 
 class Issue(UserDict.UserDict):
     """ 
     This is a class to represent an issue of some kind 
-    TODO
-    - it would be nice if the storage format were human but for now
-      pickle is fast and easy.
     """
     types = {'t':'Task','b':'Bug','f':'Feature'}
     
@@ -109,31 +107,40 @@ class Issue(UserDict.UserDict):
         
     def save( self ):
         """ save the thing """
-        fname = os.path.join(self.dir_name, self['Id'])
-        f = open( fname, 'wb' )
-        pickle.dump(self.data,f)
-        pickle.dump(self.comments,f)
-        f.close()
+        self.save_xml()
+        #fname = os.path.join(self.dir_name, self['Id'])
+        #f = open( fname, 'wb' )
+        #pickle.dump(self.data,f)
+        #pickle.dump(self.comments,f)
+        #f.close()
         
     def load( self, uid ):
         """ load the thing """
-        fname = os.path.join(self.dir_name, uid )
         try:
-            f = open( fname, 'rb' )
-            self.data = pickle.load(f)
-            self.comments = pickle.load(f)
-            f.close()
+          self.load_pickle( uid )
         except:
+          try:
+            self.load_xml( uid )
+          except:
             return False
         return True
 
+    def load_pickle( self, uid ):
+      """ load and old style pickle format """
+      fname = os.path.join(self.dir_name, uid )
+      f = open( fname, 'rb' )
+      self.data = pickle.load(f)
+      self.comments = pickle.load(f)
+      f.close()
+
     def createNodeWithText( self, doc, name, value ):
+      """ create and return a dome node with a text node element """
       node = doc.createElement( name )
       node.appendChild(doc.createTextNode(value))
       return node
 
     def save_xml( self ):
-      """ save the thing """
+      """ save the thing to xml """
       fname = os.path.join(self.dir_name, self['Id'])
       doc = minidom.getDOMImplementation().createDocument(None,"issue",None)
       doc.documentElement.appendChild(self.createNodeWithText(doc,"id", self['Id']))
@@ -158,36 +165,31 @@ class Issue(UserDict.UserDict):
 
 
     def load_xml( self, uid ):
+      """ load an issue from xml """
       fname = os.path.join(self.dir_name, uid )
-      try:
-          doc = minidom.parse( fname )
-          self.reset()
-          for node in doc.documentElement.childNodes:
-            if node.nodeName == 'id':
-              self['Id'] = node.childNodes[0].nodeValue.strip()
-            if node.nodeName == 'title':
-              self["Title"] = node.childNodes[0].nodeValue.strip()
-            if node.nodeName == 'date':
-              self['Date'] = node.childNodes[0].nodeValue.strip()
-            if node.nodeName == 'status':
-              self["Status"] = node.childNodes[0].nodeValue.strip()
-            if node.nodeName == 'type':
-              self['Type'] = node.childNodes[0].nodeValue.strip()
-            if node.nodeName == 'author':
-              self["Author"] = node.childNodes[0].nodeValue.strip()
-            if node.nodeName == 'description':
-              self["Description"] = node.childNodes[0].nodeValue.strip()
-              
-          # comments
-          for node in doc.getElementsByTagName('comment'):
-            dt = time.mktime(datetime.datetime.strptime(node.getAttribute('date'),"%Y-%m-%dT%H:%M:%SZ").timetuple())
-            self.comments[dt] = node.childNodes[0].nodeValue.strip()
+      doc = minidom.parse( fname )
+      self.reset()
+      for node in doc.documentElement.childNodes:
+        if node.nodeName == 'id':
+          self['Id'] = node.childNodes[0].nodeValue.strip()
+        if node.nodeName == 'title':
+          self["Title"] = node.childNodes[0].nodeValue.strip()
+        if node.nodeName == 'date':
+          self['Date'] = node.childNodes[0].nodeValue.strip()
+        if node.nodeName == 'status':
+          self["Status"] = node.childNodes[0].nodeValue.strip()
+        if node.nodeName == 'type':
+          self['Type'] = node.childNodes[0].nodeValue.strip()
+        if node.nodeName == 'author':
+          self["Author"] = node.childNodes[0].nodeValue.strip()
+        if node.nodeName == 'description':
+          self["Description"] = node.childNodes[0].nodeValue.strip()
+          
+      # comments
+      for node in doc.getElementsByTagName('comment'):
+        dt = time.mktime(datetime.datetime.strptime(node.getAttribute('date'),"%Y-%m-%dT%H:%M:%SZ").timetuple())
+        self.comments[dt] = node.childNodes[0].nodeValue.strip()
             
-      except Exception, e:
-        print e
-        return False
-      return True
-
 # ------------------
 # U N I T  T E S T S
 # ------------------

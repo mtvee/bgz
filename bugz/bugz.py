@@ -1,4 +1,4 @@
-# -*- Mode: python; tab-width: 2; indent-tabs-mode: nil; encoding: utf-8 -*-
+# -*- Mode: python; tab-width: 4; indent-tabs-mode: nil; encoding: utf-8 -*-
 """
 bgz
 http://github.com/mtvee/bgz
@@ -13,6 +13,7 @@ import re
 import datetime
 import dateparse
 import shutil
+import UserDict
 
 from issue import Issue
 
@@ -20,14 +21,15 @@ class Bugz:
     # the global rc file name
     BGZRC_GLOBAL = ".bugzrc"
     # the local rc file name
-    BGZRC_LOCAL = "_bgzrc"
+    BGZRC_LOCAL = "_bgzrc" 
     # the global projects file
     BGZRC_PROJS = ".bgzprojs"
     # the bugz folder name
     BGZ_DIR = '.bugz'
     
     """ this is the bugz class that handles the user """    
-    def __init__( self ):
+    def __init__( self, opts = UserDict.UserDict ):
+        self.opts = opts
         self.editor_cmd = 'vi'
         self.user_id = os.environ['USER']
         self.user_name = self.user_id
@@ -302,12 +304,17 @@ class Bugz:
         
         where type is:
                 (b)ug | (t)ask | (f)eature
-        """
+        """            
         self._check_status()
+        # default type
+        if len(args) < 1:
+            args = ['bug']
+            
         if len(args) and args[0][0] in Issue.types.keys() or args[0][0] == 'p':
             type = args[0][0]
         else:
             type = self._read_input( 'Type: (b)ug, (f)eature, (t)ask | (p)roject?', 'b', ('b','t','f','p'))
+            
         if type =='p':
             self._add_project( self.BGZ_DIR )
             return
@@ -364,6 +371,11 @@ class Bugz:
     # -------------------------
     # protected/private methods
     # -------------------------
+    def _debug( msg ):
+        """ do some logging """
+        if self.opts.debug:
+            print "DEBUG: " + msg
+    
     def _change_status( self, uid, status ):
         """ change the status on an issue """
         iss = self._find_issue(uid)
