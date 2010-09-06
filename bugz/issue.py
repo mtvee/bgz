@@ -36,15 +36,17 @@ class Issue(UserDict.UserDict):
         self.reset()
         
     def reset( self ):
-      self.data = {}
-      self.comments = {}
-      for key in self.defaults.keys():
-          self.data[key] = self.defaults[key]
+        """ reset the data and comments to default """
+        self.data = {}
+        self.comments = {}
+        for key in self.defaults.keys():
+            self.data[key] = self.defaults[key]
     
     def __eq__( self, other ):
-      if self['Id'] == other['Id']:
-        return True
-      return False
+        """ compare two issues for equality """
+        if self['Id'] == other['Id']:
+            return True
+        return False
               
     def __str__( self ):
         """ return a short descriptive string thing """
@@ -60,6 +62,7 @@ class Issue(UserDict.UserDict):
         return ret
         
     def date( self ):
+        """ return a string rep of the date """
         return datetime.datetime.strptime( self['Date'],"%Y-%m-%dT%H:%M:%SZ")
         
     def show( self ):
@@ -82,6 +85,7 @@ class Issue(UserDict.UserDict):
             print
         
     def time_total( self, dts = None ):
+        """ total the time from comments in this issue """
         tm = [0,0]
         for k, v in self.comments.iteritems():
             # ignore if we have a date range and we are outside of it
@@ -126,7 +130,11 @@ class Issue(UserDict.UserDict):
         return True
 
     def load_pickle( self, uid ):
-      """ load and old style pickle format """
+      """ 
+      load and old style pickle format 
+      
+      throw and Exception on fail
+      """
       fname = os.path.join(self.dir_name, uid )
       f = open( fname, 'rb' )
       self.data = pickle.load(f)
@@ -140,16 +148,21 @@ class Issue(UserDict.UserDict):
       return node
 
     def save_xml( self ):
-      """ save the thing to xml """
+      """ 
+      save the thing to xml 
+      
+      throw an exception on fail
+      """
       fname = os.path.join(self.dir_name, self['Id'])
       doc = minidom.getDOMImplementation().createDocument(None,"issue",None)
-      doc.documentElement.appendChild(self.createNodeWithText(doc,"id", self['Id']))
-      doc.documentElement.appendChild(self.createNodeWithText(doc,"title", self['Title']))
-      doc.documentElement.appendChild(self.createNodeWithText(doc,"date", self['Date']))
-      doc.documentElement.appendChild(self.createNodeWithText(doc,"status", self['Status']))
-      doc.documentElement.appendChild(self.createNodeWithText(doc,"type", self['Type']))
-      doc.documentElement.appendChild(self.createNodeWithText(doc,"author", self['Author']))
-      doc.documentElement.appendChild(self.createNodeWithText(doc,"description", self['Description']))
+      root = doc.documentElement
+      root.appendChild(self.createNodeWithText(doc,"id", self['Id']))
+      root.appendChild(self.createNodeWithText(doc,"title", self['Title']))
+      root.appendChild(self.createNodeWithText(doc,"date", self['Date']))
+      root.appendChild(self.createNodeWithText(doc,"status", self['Status']))
+      root.appendChild(self.createNodeWithText(doc,"type", self['Type']))
+      root.appendChild(self.createNodeWithText(doc,"author", self['Author']))
+      root.appendChild(self.createNodeWithText(doc,"description", self['Description']))
       comments = doc.createElement('comments')
       keys = self.comments.keys()
       keys.sort()
@@ -158,14 +171,18 @@ class Issue(UserDict.UserDict):
           comment.setAttribute('date', time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(key) ) )
           comment.appendChild( doc.createTextNode(self.comments[key]))
           comments.appendChild( comment )
-      doc.documentElement.appendChild( comments )
+      root.appendChild( comments )
       f = open( fname, 'wb' )
-      f.write( doc.toprettyxml( indent="  ") )
+      f.write( doc.toprettyxml( encoding="utf-8", indent="  ") )
       f.close()
 
 
     def load_xml( self, uid ):
-      """ load an issue from xml """
+      """ 
+      load an issue from xml 
+      
+      throw an exception on fail
+      """
       fname = os.path.join(self.dir_name, uid )
       doc = minidom.parse( fname )
       self.reset()
@@ -190,28 +207,3 @@ class Issue(UserDict.UserDict):
         dt = time.mktime(datetime.datetime.strptime(node.getAttribute('date'),"%Y-%m-%dT%H:%M:%SZ").timetuple())
         self.comments[dt] = node.childNodes[0].nodeValue.strip()
             
-# ------------------
-# U N I T  T E S T S
-# ------------------
-import unittest
-
-class IssueTests(unittest.TestCase):
-    def setUp( self ):
-        pass
-
-    def testLoadSave( self ):
-      iss1 = Issue('.')
-      iss1['Description'] = "This is a description\nof some stuff"
-      iss1.add_comment("This is a comment")
-      iss1.add_comment("This is another comment")
-      iss1.save_xml()
-      iid = iss1['Id']
-      # another issue
-      iss2 = Issue('.')
-      iss2.load_xml( iid )
-      iss2.show()
-      self.assertEqual( iss1, iss2 )
-      os.unlink( iid )
-        
-if __name__ == '__main__':
-    unittest.main()

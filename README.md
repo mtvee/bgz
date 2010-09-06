@@ -112,7 +112,7 @@ TODO
 ----
 - [ ] facilitate issue merging for conflicts (xml format will easier)
 - [ ] report output, templates, xml, json??
-- [ ] automatic conversion from pickle style repo to xml
+- [-] automatic conversion from pickle style repo to xml
 - [x] save/load to xml
 - [-] need better search params for reports
 - [-] account for windows' path stuff
