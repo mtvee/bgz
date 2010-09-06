@@ -110,9 +110,8 @@ Changes
 
 TODO
 ----
-- [ ] easy ties/links to various VCSs?
-- [-] some easy way to keep track of time spent and totals
-- [ ] report output, templates??
+- [ ] facilitate issue merging for conflicts
+- [ ] report output, templates, xml, json??
 - [-] need better search params for reports
-- [ ] account for windows' path stuff
+- [-] account for windows' path stuff
 - [-] write some real unit tests once the commands are solidified

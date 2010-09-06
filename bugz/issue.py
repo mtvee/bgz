@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- Mode: python; tab-width: 2; indent-tabs-mode: nil; encoding: utf-8 -*-
 """
 bgz
 http://github.com/mtvee/bgz
@@ -9,10 +9,10 @@ Copyright (c) 2010 J. Knight. All rights reserved.
 import os
 import time
 import datetime
-import pickle
 import uuid
 import UserDict
-
+import pickle
+from xml.dom import minidom
 
 class Issue(UserDict.UserDict):
     """ 
@@ -25,19 +25,29 @@ class Issue(UserDict.UserDict):
     
     def __init__( self, dname ):
         self.dir_name = dname
-        self.data = {}
-        self.comments = {}
         # default keys and values
-        self.defaults = {'Id':str(uuid.uuid1()),
+        self.defaults = {
+                    'Id':str(uuid.uuid1()),
                     'Title': 'No Title',
                     'Date': time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                     'Status': 'new',
                     'Author': 'anon',
                     'Type': 'b',
-                    'Description': ''}
-        for key in self.defaults.keys():
-            self.data[key] = self.defaults[key]
-                
+                    'Description': ''
+                    }
+        self.reset()
+        
+    def reset( self ):
+      self.data = {}
+      self.comments = {}
+      for key in self.defaults.keys():
+          self.data[key] = self.defaults[key]
+    
+    def __eq__( self, other ):
+      if self['Id'] == other['Id']:
+        return True
+      return False
+              
     def __str__( self ):
         """ return a short descriptive string thing """
         return self.rep()
@@ -117,6 +127,66 @@ class Issue(UserDict.UserDict):
             return False
         return True
 
+    def createNodeWithText( self, doc, name, value ):
+      node = doc.createElement( name )
+      node.appendChild(doc.createTextNode(value))
+      return node
+
+    def save_xml( self ):
+      """ save the thing """
+      fname = os.path.join(self.dir_name, self['Id'])
+      doc = minidom.getDOMImplementation().createDocument(None,"issue",None)
+      doc.documentElement.appendChild(self.createNodeWithText(doc,"id", self['Id']))
+      doc.documentElement.appendChild(self.createNodeWithText(doc,"title", self['Title']))
+      doc.documentElement.appendChild(self.createNodeWithText(doc,"date", self['Date']))
+      doc.documentElement.appendChild(self.createNodeWithText(doc,"status", self['Status']))
+      doc.documentElement.appendChild(self.createNodeWithText(doc,"type", self['Type']))
+      doc.documentElement.appendChild(self.createNodeWithText(doc,"author", self['Author']))
+      doc.documentElement.appendChild(self.createNodeWithText(doc,"description", self['Description']))
+      comments = doc.createElement('comments')
+      keys = self.comments.keys()
+      keys.sort()
+      for key in keys:
+          comment = doc.createElement('comment')
+          comment.setAttribute('date', time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(key) ) )
+          comment.appendChild( doc.createTextNode(self.comments[key]))
+          comments.appendChild( comment )
+      doc.documentElement.appendChild( comments )
+      f = open( fname, 'wb' )
+      f.write( doc.toprettyxml( indent="  ") )
+      f.close()
+
+
+    def load_xml( self, uid ):
+      fname = os.path.join(self.dir_name, uid )
+      try:
+          doc = minidom.parse( fname )
+          self.reset()
+          for node in doc.documentElement.childNodes:
+            if node.nodeName == 'id':
+              self['Id'] = node.childNodes[0].nodeValue.strip()
+            if node.nodeName == 'title':
+              self["Title"] = node.childNodes[0].nodeValue.strip()
+            if node.nodeName == 'date':
+              self['Date'] = node.childNodes[0].nodeValue.strip()
+            if node.nodeName == 'status':
+              self["Status"] = node.childNodes[0].nodeValue.strip()
+            if node.nodeName == 'type':
+              self['Type'] = node.childNodes[0].nodeValue.strip()
+            if node.nodeName == 'author':
+              self["Author"] = node.childNodes[0].nodeValue.strip()
+            if node.nodeName == 'description':
+              self["Description"] = node.childNodes[0].nodeValue.strip()
+              
+          # comments
+          for node in doc.getElementsByTagName('comment'):
+            dt = time.mktime(datetime.datetime.strptime(node.getAttribute('date'),"%Y-%m-%dT%H:%M:%SZ").timetuple())
+            self.comments[dt] = node.childNodes[0].nodeValue.strip()
+            
+      except Exception, e:
+        print e
+        return False
+      return True
 
 # ------------------
 # U N I T  T E S T S
@@ -127,8 +197,19 @@ class IssueTests(unittest.TestCase):
     def setUp( self ):
         pass
 
-    def testSomething( self ):
-        self.assertEquals( 1, 1 )
+    def testLoadSave( self ):
+      iss1 = Issue('.')
+      iss1['Description'] = "This is a description\nof some stuff"
+      iss1.add_comment("This is a comment")
+      iss1.add_comment("This is another comment")
+      iss1.save_xml()
+      iid = iss1['Id']
+      # another issue
+      iss2 = Issue('.')
+      iss2.load_xml( iid )
+      iss2.show()
+      self.assertEqual( iss1, iss2 )
+      os.unlink( iid )
         
 if __name__ == '__main__':
     unittest.main()

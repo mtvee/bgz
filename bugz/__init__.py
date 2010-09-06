@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# encoding: utf-8
+# -*- Mode: python; tab-width: 2; indent-tabs-mode: nil; encoding: utf-8 -*-
 # ------------------------------------------------------------------------
 # The contents of this file are subject to the Mozilla Public License
 # Version 1.1 (the "License"); you may not use this file except in

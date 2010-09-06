@@ -1,4 +1,5 @@
-# encoding: utf-8
+# -*- Mode: python; tab-width: 2; indent-tabs-mode: nil; encoding: utf-8 -*-
+
 """
 bgz
 http://github.com/mtvee/bgz
