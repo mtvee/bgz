@@ -1,10 +1,9 @@
     _\o/_   Bugz 
     /(_)\   v0.2.1
 
-Bugz is a simple command line bug tracking tool written in python. It uses
-ascii text files (actually pickles at the moment) to keep a database of 
-bugs so it can live in the source tree of the project and become part of 
-the versioning system.
+Bugz is a simple command line bug tracking tool written in python. It uses xml
+text files to keep a database of bugs so it can live in the source tree of the
+project and become part of the versioning system.
 
 Installing
 ----------
@@ -49,7 +48,7 @@ Commands
 - `drop [ID]`         - drop an issue or project
 - `edit [ID]`         - edit an issue
 - `comment [ID]`      - comment on an issue
-- `show [ID|FIELD]`   - show an issue. FIELD like s:open OR t:bug
+- `show [ID|FIELD]`   - show an issue. FIELD like s:open OR ty:bug
 - `open [ID]`         - open an issue
 - `close [ID]`        - close an issue
 - `time [add ID|DR]`  - add time or show by daterange (DR see `Dates` below)
@@ -104,7 +103,7 @@ PROJECT/.bugz/_bugzrc
 Changes
 -------
 - 2010-09-07 - better searching with 'show'                             v0.2.1
-             - switched to XML format
+             - switched to XML format for issue storage
 - 2010-03-23 - report time across projects                              v0.1.0
 - 2010-03-11 - better reporting, config system, purge                   v0.0.3
 - 2010-02-22 - basic handling of assoc time with an issue               v0.0.2
