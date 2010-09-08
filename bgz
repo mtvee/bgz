@@ -34,10 +34,11 @@ class Usage(Exception):
         self.msg = self.msg + "\n" + msg
 
 def main(argv=None):
-  
-    defaults = UserDict.UserDict()
-    defaults.verbose = False
-    defaults.debug = False
+    
+    # default command line options
+    options = UserDict.UserDict()
+    options.verbose = False
+    options.debug = False
     
     if argv is None:
         argv = sys.argv
@@ -51,9 +52,9 @@ def main(argv=None):
         # option processing
         for option, value in opts:
             if option in ("-v","--verbose"):
-                defaults.verbose = True
+                options.verbose = True
             if option in ("-d","--debug"):
-                defaults.debug = True
+                options.debug = True
             if option in ("-h", "--help"):
                 raise Usage(help_message)
             if option in ("-o", "--output"):
@@ -65,7 +66,7 @@ def main(argv=None):
                 sys.exit( 0 )
 
                 
-        b = Bugz( opts )
+        b = Bugz( options )
         b.run( args )
         
     except Usage, err:

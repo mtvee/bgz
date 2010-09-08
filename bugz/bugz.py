@@ -21,7 +21,7 @@ class Bugz:
     # the global rc file name
     BGZRC_GLOBAL = ".bugzrc"
     # the local rc file name
-    BGZRC_LOCAL = "_bgzrc" 
+    BGZRC_LOCAL = "_bugzrc" 
     # the global projects file
     BGZRC_PROJS = ".bgzprojs"
     # the bugz folder name
@@ -30,9 +30,9 @@ class Bugz:
     """ this is the bugz class that handles the user """    
     def __init__( self, opts = UserDict.UserDict ):
         self.opts = opts
-        self.editor_cmd = 'vi'
-        self.user_id = os.environ['USER']
-        self.user_name = self.user_id
+        self.opts['editor'] = 'vi'
+        self.opts['user.name'] = os.environ['USER']
+        self.opts['user.email'] = ''
         self._read_init()
         if self._find_bugs_dir():
             # try for a local config file            
@@ -62,6 +62,45 @@ class Bugz:
             print "\n"
             return False
 
+    # ------------------------
+    # U S E R  C O M M A N D S
+    # ------------------------
+    def do_add( self, args ):
+        """ add an issue 
+        
+        bgz add [type]
+        
+        where type is:
+                (b)ug | (t)ask | (f)eature
+        """            
+        self._check_status()
+        # default type
+        if len(args) < 1:
+            args = ['bug']
+            
+        if len(args) and args[0][0] in Issue.types.keys() or args[0][0] == 'p':
+            type = args[0][0]
+        else:
+            type = self._read_input( 'Type: (b)ug, (f)eature, (t)ask | (p)roject?', 'b', ('b','t','f','p'))
+            
+        if type =='p':
+            self._add_project( self.BGZ_DIR )
+            return
+        print 'Adding new ' + Issue.types[type].lower()
+        title = self._read_input('Title')
+        author = self._read_input('Author',self.opts['user.name'])
+        #desc = self._read_multiline('Descr')
+        desc = self._external_edit('\n\n### ' + title )
+        
+        issue = Issue( self.BGZ_DIR )
+        issue['Title'] = title
+        issue['Description'] = desc
+        issue['Type'] = type
+        issue['Author'] = author
+        issue.save()        
+        print 'Added: ' + str(issue)
+    
+    
     def do_status( self, args ):
         """ get the database status 
         
@@ -268,7 +307,6 @@ class Bugz:
         
         bgz show [partial_UUID]
         bgz show [a:author] [s:status] [ty:type] [ti:title] [d:date_range] 
-        bgz show / TITLE
         """
         self._check_status()
         files = os.listdir( self.BGZ_DIR )
@@ -307,40 +345,6 @@ class Bugz:
                 if file.startswith( args[0] ):
                     issue.show()
 
-    def do_add( self, args ):
-        """ add an issue 
-        
-        bgz add [type]
-        
-        where type is:
-                (b)ug | (t)ask | (f)eature
-        """            
-        self._check_status()
-        # default type
-        if len(args) < 1:
-            args = ['bug']
-            
-        if len(args) and args[0][0] in Issue.types.keys() or args[0][0] == 'p':
-            type = args[0][0]
-        else:
-            type = self._read_input( 'Type: (b)ug, (f)eature, (t)ask | (p)roject?', 'b', ('b','t','f','p'))
-            
-        if type =='p':
-            self._add_project( self.BGZ_DIR )
-            return
-        print 'Adding new ' + Issue.types[type].lower()
-        title = self._read_input('Title')
-        author = self._read_input('Author',self.user_id)
-        #desc = self._read_multiline('Descr')
-        desc = self._external_edit('\n\n### ' + title )
-        
-        issue = Issue( self.BGZ_DIR )
-        issue['Title'] = title
-        issue['Description'] = desc
-        issue['Type'] = type
-        issue['Author'] = author
-        issue.save()        
-        print 'Added: ' + str(issue)
         
     def do_help( self, args ):
         """ show help
@@ -362,21 +366,32 @@ class Bugz:
             print
         
     def do_config( self, args ):
-        """ create a config file 
+        """ show or set values in global or local config file 
         
-        bgz config [global]
+        bgz config
+        bgz config [--global] [name [value]]
         """
+        args.reverse()
         init_file = os.path.join(self.BGZ_DIR, self.BGZRC_LOCAL)
-        if len(args) and args[0][0] == 'g':            
+        if len(args) and args[-1].startswith('--g'):            
             init_file = os.path.join(os.getenv("HOME"), self.BGZRC_GLOBAL)
-        print 'Creating ' + init_file
-        user = self._read_input("Your name: ", os.getenv("USER"))
-        email = self._read_input("Your email: ", user + "@" + os.uname()[1])
-        f = open( init_file, 'w' )
-        f.write("user=" + user + "\n")
-        f.write("email=" + email + "\n")
-        f.close()
-        print "Wrote " + init_file
+            args.pop()
+        # we are setting a value
+        if len(args):
+            key = args.pop()
+            value = ''
+            if len(args):
+                value = args.pop()
+            self.opts[key] = value
+            self._save_config( init_file )
+        else:
+            print 'Config settings'
+            print '---------------'
+            keys = self.opts.keys()
+            keys.sort()
+            for key in keys:
+                print key + ' = ' + self.opts[key]
+            print
         
     # -------------------------
     # protected/private methods
@@ -410,11 +425,11 @@ class Bugz:
     def _find_issue( self, uid ):
         """ find an issue with a partial uid """
         if uid.startswith('g'):
-            if not os.path.exists(os.path.join(self.BGZ_DIR,'general.' + self.user_name)):
+            if not os.path.exists(os.path.join(self.BGZ_DIR,'general.' + self.opts['user.name'])):
                 gen = Issue(self.BGZ_DIR)
-                gen['Id'] = 'general.' + self.user_name
+                gen['Id'] = 'general.' + self.opts['user.name']
                 gen['Title'] = 'General Project Catchall'
-                gen['Author'] = self.user_id
+                gen['Author'] = self.opts['user.name']
                 gen['Type'] = 'task'
                 gen['Status'] = 'open'
                 gen.save()
@@ -461,7 +476,7 @@ class Bugz:
         f = open( tfile, 'w')
         f.write( dflt )
         f.close()
-        os.system( "%s %s" % (self.editor_cmd, tfile) )
+        os.system( "%s %s" % (self.opts['editor'], tfile) )
         f = open( tfile, 'r' )
         data = f.readlines()            
         f.close()
@@ -547,25 +562,20 @@ class Bugz:
                 print 'Dropped project: ' + ppath
         self._save_projects( projects )
         
+    def _save_config( self, fname ):
+        f = open( fname, 'w' )        
+        for key in self.opts.keys():
+            f.write( key + '=' + self.opts[key] + "\n" )            
+        f.close()
+        
     def _read_config( self, conf ):
         """ read in a config file """
         f = open( conf, 'r' )
         lines = f.readlines()
         f.close()
-        user = self.user_id
-        email = ''
         for line in lines:
             line = line.strip()
             if line[0] == '#' or line[0] == ';':
                 continue
             tmp = line.split('=')
-            if(tmp[0] == 'user'):
-                user = tmp[1].strip()
-            if(tmp[0] == 'email'):
-                email = tmp[1].strip()
-            if(tmp[0] == 'editor'):
-                self.editor_cmd = tmp[1].strip()
-        self.user_name = user.lower().replace(' ','_')
-        self.user_id = user
-        if len(email):
-            self.user_id += ' <' + email + '>'
+            self.opts[tmp[0].strip()] = tmp[1].strip()
