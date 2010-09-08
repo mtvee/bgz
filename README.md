@@ -1,5 +1,5 @@
     _\o/_   Bugz 
-    /(_)\   v0.2.1
+    /(_)\   v0.2.2
 
 Bugz is a simple command line bug tracking tool written in python. It uses xml
 text files to keep a database of bugs so it can live in the source tree of the
@@ -52,7 +52,7 @@ Commands
 - `open [ID]`         - open an issue
 - `close [ID]`        - close an issue
 - `time [add ID|DR]`  - add time or show by daterange (DR see `Dates` below)
-- `config [global]`   - set some configuration variables
+- `config [--global]` - show/set some configuration variables
 - `purge`             - move closed issues to a purged directory
 
 Filtering
@@ -95,13 +95,23 @@ PROJECT/.bugz/_bugzrc
     ---[snip]---
     # comment
     ; another comment
-    user=your name
-    email=me@someplace.com
+    user.name=your name
+    user.email=me@someplace.com
     editor=mate -w
     ---[snip]---
 
+You can set key values with the 'config' command. For example, to set your
+editor to textmate:
+
+    $> bgz config editor "mate -w"
+
+or you name
+
+    $> bgz config user.name "j. knight"
+
 Changes
 -------
+- 2010-09-08 - fixed rc/conf issues                                     v0.2.2
 - 2010-09-07 - better searching with 'show'                             v0.2.1
              - switched to XML format for issue storage
 - 2010-03-23 - report time across projects                              v0.1.0
