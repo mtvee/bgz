@@ -18,6 +18,7 @@ import UserDict
 from issue import Issue
 
 class BugzError( Exception ):
+    """ Bugz exception class """
     def __init__( self, msg ):
         self.msg = msg
         
@@ -26,6 +27,8 @@ class BugzError( Exception ):
         
 
 class Bugz:
+    """ this is the bugz class that handles the user interaction """    
+    
     # the global rc file name
     BGZRC_GLOBAL = ".bugzrc"
     # the local rc file name
@@ -37,7 +40,6 @@ class Bugz:
     # actual found path, if any
     BGZ_DIR = '.bugz'
     
-    """ this is the bugz class that handles the user """    
     def __init__( self, opts = UserDict.UserDict ):
         self.opts = opts
         self.opts['editor'] = 'vi'
@@ -67,9 +69,9 @@ class Bugz:
             return func(args)
         except AttributeError, e:
             try:
+                # try this as default
                 return self.do_show([cmd])
             except:
-                print e
                 print 'Unknown command: [' + cmd + ']'
                 return False
         except BugzError, e:
@@ -206,7 +208,7 @@ class Bugz:
             if issue['Status'][0] == 'c':
                 shutil.move(os.path.join(self.BGZ_DIR,file), ppath)
                 count += 1
-        print 'purged %d issue(s)' % (count)
+        self._log( 'purged %d issue(s)' % (count) )
                     
     def do_open( self, args ):
         """ open an issue 
@@ -366,12 +368,10 @@ class Bugz:
                     if not issues.has_key( issue['Type'] ):
                         issues[issue['Type'][0]] = []
                     issues[issue['Type'][0]].append( issue )
-                    #print issue.rep(None, self.opts.ansi )
             elif len(args) and args[0] == 'all':
                 if not issues.has_key( issue['Type'] ):
                     issues[issue['Type'][0]] = []
                 issues[issue['Type'][0]].append( issue )
-                #print issue.rep(None, self.opts.ansi)
             else:
                 if len(args):
                     if file.startswith( args[0] ):
@@ -430,8 +430,9 @@ class Bugz:
     # protected/private methods
     # -------------------------
     def _show_issues( self, issues ):
-        """ output issues as a dict of types to array of issues 
-            issues = {'b':[...,],'t',[...,],...}
+        """ output issues gourped by type
+            
+            @param issues a dict of types to array of issues - issues = {'b':[...,],'t',[...,],...}
         """
         for t in issues.keys():
             if not len(issues[t]):
@@ -568,8 +569,7 @@ class Bugz:
     def _check_status( self ):
         """ make sure we have a data dir to work with """
         if not os.path.exists( self.BGZ_DIR ):
-            print 'abort: No bugz repository found (%s)' %  self.BGZ_DIR
-            sys.exit( 1 )
+            raise BugzError( 'abort: No bugz repository found (%s)' %  self.BGZ_DIR )
                 
     def _read_projects( self ):
         """ read in the projects list, if any """
@@ -582,13 +582,10 @@ class Bugz:
     def _save_projects( self, projects ):
         """ save a list of project directories """
         proj_file = os.path.join(self._home_dir(), self.BGZRC_PROJS)
-        try:
-            f = open( proj_file, 'w' )
-            for proj in projects:
-                f.write( proj + "\n" )
-            f.close()
-        except Exception, e:
-            print e
+        f = open( proj_file, 'w' )
+        for proj in projects:
+            f.write( proj + "\n" )
+        f.close()
         
     def _add_project( self, proj_path ):
         """ add a project to the project path list """
@@ -597,10 +594,9 @@ class Bugz:
         projects = self._read_projects()
         for proj in projects:
             if ppath == proj:
-                print 'Project exists: ' + ppath
-                return
+                raise BugzError( 'Project exists: ' + ppath )
         projects.append( ppath )
-        print 'Added project: ' + ppath
+        self._log( 'Added project: ' + ppath )
         self._save_projects( projects )
         
     def _remove_project( self, proj_path ):
@@ -611,7 +607,7 @@ class Bugz:
         for proj in projects:
             if ppath == proj:
                 projects.remove( ppath )
-                print 'Dropped project: ' + ppath
+                self._log( 'Dropped project: ' + ppath )
         self._save_projects( projects )
         
     def _save_config( self, fname ):
@@ -630,6 +626,7 @@ class Bugz:
             if line[0] == '#' or line[0] == ';':
                 continue
             tmp = line.split('=')
+            # handle bool
             if tmp[1].strip() in ["on","yes","1"]:
                 self.opts[tmp[0].strip()] = True
             elif tmp[1].strip() in ["off","no","0"]:
