@@ -39,6 +39,7 @@ def main(argv=None):
     options = UserDict.UserDict()
     options.verbose = False
     options.debug = False
+    options.ansi = True
     
     if argv is None:
         argv = sys.argv

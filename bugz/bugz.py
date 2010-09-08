@@ -26,6 +26,8 @@ class Bugz:
     BGZRC_PROJS = ".bgzprojs"
     # the bugz folder name
     BGZ_DIR = '.bugz'
+    # ansi colors
+    COLORS = {'black':"[30m","red":"[31m","green":"[32m","yellow":"[33m","blue":"[34m"}
     
     """ this is the bugz class that handles the user """    
     def __init__( self, opts = UserDict.UserDict ):
@@ -33,6 +35,7 @@ class Bugz:
         self.opts['editor'] = 'vi'
         self.opts['user.name'] = os.environ['USER']
         self.opts['user.email'] = ''
+        self.opts['ansi'] = self.opts.ansi
         self._read_init()
         if self._find_bugs_dir():
             # try for a local config file            
@@ -55,9 +58,12 @@ class Bugz:
             func = getattr(self,'do_' + cmd)
             return func(args)
         except AttributeError, e:
-            print e
-            print 'Unknown command: [' + cmd + ']'
-            return False
+            try:
+                return self.do_show([cmd])
+            except:
+                print e
+                print 'Unknown command: [' + cmd + ']'
+                return False
         except KeyboardInterrupt:
             print "\n"
             return False
@@ -115,23 +121,29 @@ class Bugz:
             if not issue.load( file ):
                 continue
             counts[issue['Status']] += 1
-            if not issues.has_key( issue['Type'] ):
+            if not issues.has_key( issue['Type'][0] ):
                 issues[issue['Type'][0]] = []
+                
             if next((a for a in args if a == 'all'),None):
                 issues[issue['Type'][0]].append( issue )
             elif issue['Status'][0] != 'c':
                 issues[issue['Type'][0]].append( issue )
         print 'Status: ',
         for k in counts.keys():
-            print k + "/" + str(counts[k]) + " ",
+            pre = ""
+            post = ""
+            if self.opts.ansi:
+                post = "\033[0m"    # reset
+                if k[0] == 'n':
+                    pre = "\033[31m"    # red     
+                elif k[0] == 'c':
+                    pre = "\033[32m"    # green   
+                elif k[0] == 'o':
+                    pre = "\033[33m"    # yellow                 
+            print pre + k + post + "/" + str(counts[k]) + " ",
         print
-        for t in issues.keys():
-            print Issue.types[t]
-            print "-" * len(Issue.types[t])
-            for issue in issues[t]:
-                print issue
-            print
-            
+        self._show_issues( issues )
+                    
     def do_init( self, args ):
         """ initialize the database 
         
@@ -307,11 +319,13 @@ class Bugz:
         
         bgz show [partial_UUID]
         bgz show [a:author] [s:status] [ty:type] [ti:title] [d:date_range] 
+        bgz show all
         """
         self._check_status()
         files = os.listdir( self.BGZ_DIR )
-        issue = Issue(self.BGZ_DIR)
+        issues = {}
         for file in files:
+            issue = Issue(self.BGZ_DIR)
             if not issue.load( file ):
                 continue
             if len(args) and args[0].find(':') != -1:
@@ -339,12 +353,21 @@ class Bugz:
                         print "Unknown qualifier: " + tmp[0]
                 # if all the args hit, then print it
                 if hitcount == len( args ):
-                    print issue
-                
+                    if not issues.has_key( issue['Type'] ):
+                        issues[issue['Type'][0]] = []
+                    issues[issue['Type'][0]].append( issue )
+                    #print issue.rep(None, self.opts.ansi )
+            elif len(args) and args[0] == 'all':
+                if not issues.has_key( issue['Type'] ):
+                    issues[issue['Type'][0]] = []
+                issues[issue['Type'][0]].append( issue )
+                #print issue.rep(None, self.opts.ansi)
             else:
-                if file.startswith( args[0] ):
-                    issue.show()
-
+                if len(args):
+                    if file.startswith( args[0] ):
+                        issue.show()
+                        return
+        self._show_issues( issues )
         
     def do_help( self, args ):
         """ show help
@@ -396,6 +419,19 @@ class Bugz:
     # -------------------------
     # protected/private methods
     # -------------------------
+    def _show_issues( self, issues ):
+        """ output issues as a dict of types to array of issues 
+            issues = {'b':[...,],'t',[...,],...}
+        """
+        for t in issues.keys():
+            if not len(issues[t]):
+                continue
+            print Issue.types[t]
+            print "-" * len(Issue.types[t])
+            for issue in issues[t]:                        
+                print issue.rep( None, self.opts.ansi )
+            print
+            
     def _debug( msg ):
         """ do some logging """
         if self.opts.debug:
@@ -578,4 +614,10 @@ class Bugz:
             if line[0] == '#' or line[0] == ';':
                 continue
             tmp = line.split('=')
-            self.opts[tmp[0].strip()] = tmp[1].strip()
+            if tmp[1].strip() in ["on","yes","1"]:
+                self.opts[tmp[0].strip()] = True
+            elif tmp[1].strip() in ["off","no","0"]:
+                self.opts[tmp[0].strip()] = False
+            else:
+                self.opts[tmp[0].strip()] = tmp[1].strip()
+        self.opts.ansi = self.opts['ansi']

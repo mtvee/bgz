@@ -52,11 +52,21 @@ class Issue(UserDict.UserDict):
         """ return a short descriptive string thing """
         return self.rep()
 
-    def rep( self, dts = None):
+    def rep( self, dts = None, ansi = False):
         """ return a short descriptive string thing """
         tmp = self['Id'].split('-')
         tm = self.time_total(dts)
-        ret = "%12s - %s/%s - %2d:%02d - %s" % (tmp[0],self['Type'][0],self['Status'].ljust(6),tm[0],tm[1],self['Title'])
+        pre = ""
+        post = ""
+        if ansi:
+            post = "\033[0m"    # reset
+            if self['Status'][0] == 'n':
+                pre = "\033[31m"    # red     
+            elif self['Status'][0] == 'c':
+                pre = "\033[32m"    # green   
+            elif self['Status'][0] == 'o':
+                pre = "\033[33m"    # yellow 
+        ret = "%s%12s%s - %s/%s - %2d:%02d - %s" % (pre,tmp[0],post,self['Type'][0],self['Status'].ljust(6),tm[0],tm[1],self['Title'])
         if len(ret) > 75:
             ret = ret[0:75] + "..."
         return ret

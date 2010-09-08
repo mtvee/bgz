@@ -105,9 +105,9 @@ editor to textmate:
 
     $> bgz config editor "mate -w"
 
-or you name
+or you name, globally
 
-    $> bgz config user.name "j. knight"
+    $> bgz config --global user.name "j. knight"
 
 Changes
 -------
