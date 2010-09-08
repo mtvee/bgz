@@ -17,6 +17,14 @@ import UserDict
 
 from issue import Issue
 
+class BugzError( Exception ):
+    def __init__( self, msg ):
+        self.msg = msg
+        
+    def __str__( self ):
+        return repr(self.msg)
+        
+
 class Bugz:
     # the global rc file name
     BGZRC_GLOBAL = ".bugzrc"
@@ -25,6 +33,8 @@ class Bugz:
     # the global projects file
     BGZRC_PROJS = ".bgzprojs"
     # the bugz folder name
+    BGZ_DIR_NAME = '.bugz'
+    # actual found path, if any
     BGZ_DIR = '.bugz'
     
     """ this is the bugz class that handles the user """    
@@ -62,6 +72,9 @@ class Bugz:
                 print e
                 print 'Unknown command: [' + cmd + ']'
                 return False
+        except BugzError, e:
+            print e.msg
+            return False
         except KeyboardInterrupt:
             print "\n"
             return False
@@ -102,7 +115,7 @@ class Bugz:
         issue['Type'] = type
         issue['Author'] = author
         issue.save()        
-        print 'Added: ' + str(issue)
+        self._log( 'Added: ' + str(issue) )
     
     
     def do_status( self, args ):
@@ -143,15 +156,15 @@ class Bugz:
         self._show_issues( issues )
                     
     def do_init( self, args ):
-        """ initialize the database 
+        """ initialize the database in the current directory, if not found 
         
         bgz init
         """
-        if os.path.exists( self.BGZ_DIR ):
-            print 'abort: repository already exists'
-            return False
-        os.mkdir( self.BGZ_DIR )
-        print 'Initialized ' + self.BGZ_DIR
+        if os.path.exists( self.BGZ_DIR_NAME ):
+            raise BugzError( 'abort: repository already exists' )
+        os.mkdir( self.BGZ_DIR_NAME )
+        self._log( 'Initialized ' + self.BGZ_DIR_NAME )
+        self.BGZ_DIR = self.BGZ_DIR_NAME
         return True
 
     def do_drop( self, args ):
@@ -184,8 +197,7 @@ class Bugz:
             try:
                 os.mkdir( ppath )
             except:
-                print 'abort: unable to create ' + ppath
-                sys.exit(2)
+                raise BugzError( 'abort: unable to create ' + ppath )
         count = 0
         for file in os.listdir( self.BGZ_DIR ):
             issue = Issue(self.BGZ_DIR)
@@ -348,7 +360,7 @@ class Bugz:
                         if issue.date() >= dts[0] and issue.date() <= dts[1]:
                             hitcount = hitcount + 1
                     else:
-                        print "Unknown qualifier: " + tmp[0]
+                        raise BugzError( "Unknown qualifier: " + tmp[0] )
                 # if all the args hit, then print it
                 if hitcount == len( args ):
                     if not issues.has_key( issue['Type'] ):
@@ -430,10 +442,16 @@ class Bugz:
                 print issue.rep( None, self.opts.ansi )
             print
             
-    def _debug( msg ):
+    def _debug( self, msg ):
         """ do some logging """
         if self.opts.debug:
             print "DEBUG: " + msg
+
+    def _log( self, msg ):
+        """ do some logging """
+        if self.opts.verbose:
+            print msg
+
     
     def _change_status( self, uid, status ):
         """ change the status on an issue """

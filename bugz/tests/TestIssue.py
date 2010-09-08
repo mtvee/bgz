@@ -10,8 +10,12 @@ from bugz.issue import Issue
 
 class testIssue( unittest.TestCase ):
     def setUp(self):
-        pass
+        if not os.path.exists( 'data' ):
+            os.mkdir( 'data' )
 
+    def tearDown( self ):
+        pass
+        
     def testLoadSaveXml( self ):
       dir_name = 'data'
       

@@ -21,7 +21,11 @@ system, with the project and in the repository.
 
 bgz [OPTIONS] [COMMAND] [ARGS...]
 where OPTIONS are:
-  --help            - print this screen
+  -d,--debug
+  -h,--help            - print this screen
+  -q,--quiet
+  -v,--verbose
+  -V,--version
 
 COMMANDS are:  
     bgz help        - for more info
@@ -37,7 +41,7 @@ def main(argv=None):
     
     # default command line options
     options = UserDict.UserDict()
-    options.verbose = False
+    options.verbose = True
     options.debug = False
     options.ansi = True
     
@@ -45,7 +49,7 @@ def main(argv=None):
         argv = sys.argv
     try:
         try:
-            opts, args = getopt.getopt(argv[1:], "dho:vV", ["debug","help", "output=","verbose","version"])
+            opts, args = getopt.getopt(argv[1:], "dho:vVq", ["debug","help", "output=","verbose","version","quiet"])
         except getopt.error, msg:
             raise Usage(msg)
 
@@ -54,6 +58,8 @@ def main(argv=None):
         for option, value in opts:
             if option in ("-v","--verbose"):
                 options.verbose = True
+            if option in ("-q","--quiet"):
+                options.verbose = False
             if option in ("-d","--debug"):
                 options.debug = True
             if option in ("-h", "--help"):
