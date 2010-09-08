@@ -26,8 +26,6 @@ class Bugz:
     BGZRC_PROJS = ".bgzprojs"
     # the bugz folder name
     BGZ_DIR = '.bugz'
-    # ansi colors
-    COLORS = {'black':"[30m","red":"[31m","green":"[32m","yellow":"[33m","blue":"[34m"}
     
     """ this is the bugz class that handles the user """    
     def __init__( self, opts = UserDict.UserDict ):
