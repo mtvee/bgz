@@ -1,5 +1,5 @@
     _\o/_   Bugz 
-    /(_)\   v0.2.2
+    /(_)\   v0.2.3
 
 Bgz is a simple command line issue tracking tool written in python. It uses
 xml text files to keep a repository of issues so it can live in the source
