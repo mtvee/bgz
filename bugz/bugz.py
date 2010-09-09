@@ -72,10 +72,10 @@ class Bugz:
                 # try this as default
                 return self.do_show([cmd])
             except:
-                print 'Unknown command: [' + cmd + ']'
+                self._log( 'Unknown command: [' + cmd + ']' )
                 return False
         except BugzError, e:
-            print e.msg
+            self._log( e.msg ) 
             return False
         except KeyboardInterrupt:
             print "\n"

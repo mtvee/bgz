@@ -1,12 +1,14 @@
     _\o/_   Bugz 
     /(_)\   v0.2.2
 
-Bugz is a simple command line bug tracking tool written in python. It uses xml
-text files to keep a database of bugs so it can live in the source tree of the
-project and become part of the versioning system.
+Bgz is a simple command line issue tracking tool written in python. It uses
+xml text files to keep a repository of issues so it can live in the source
+tree of the project and become part of the source versioning system
 
 Installing
 ----------
+You can find the code at http://github.com/mtvee/bgz
+
 Unfold the archive or checkout the source tree and:
 
 `$> sudo python setup.py install`
@@ -24,14 +26,16 @@ Running
 -------
 Bugz is git like. Here's a quick sample sesh...
 
-    cd my/cool/project
-    bgz init
+    $> cd my/cool/project
+    $> bgz init
     >> Initialized .bugz
-    bgz add task
+    $> bgz add task
+    >> Adding new task
     >> Title: Do something
-    >> Author [me]: 
+    >> Author [me]:
+    -> runs editor to add a description 
     >> Added:     ad6cfa42 - t/new    -  0:00 - Do something
-    bgz status
+    $> bgz status
     >> Status:  new/1  open/0  closed/0 
     >> Task
     >> ----
@@ -42,6 +46,13 @@ from anywhere in the tree.
 
 Commands
 --------
+Usage: 
+
+    $> bgz [COMMAND] [ARG,...]
+
+Commands are:
+
+- `help`              - show help
 - `init`              - initialize a new db
 - `add`               - add a new issue or project
 - `status`            - get the db status
@@ -58,7 +69,7 @@ Commands
 Filtering
 ---------
 You can filter the `show` command using `field:criteria`. Current the filterable
-fields are [s]tatus, [t]ype or [d]ate.
+fields are [s]tatus, [ty]pe, [ti]tle, [a]uthor and [d]ate.
 
 e.g.
 
@@ -97,7 +108,7 @@ PROJECT/.bugz/_bugzrc
     ; another comment
     user.name=your name
     user.email=me@someplace.com
-    editor=mate -w
+    editor=vi
     ---[snip]---
 
 You can set key values with the 'config' command. For example, to set your
@@ -105,9 +116,18 @@ editor to textmate:
 
     $> bgz config editor "mate -w"
 
-or you name, globally
+or to set your name, globally
 
     $> bgz config --global user.name "j. knight"
+
+Recognized configuration items are:
+
+user.name   [string]
+user.email  [string]
+editor      [string]
+ansi        [bool]
+
+Boolean items take [yes,on,1] or [no,off,0]
 
 Changes
 -------
@@ -121,10 +141,19 @@ Changes
 
 TODO
 ----
-- [ ] facilitate issue merging for conflicts (xml format will easier)
+- [ ] some DVCS integration (user info, etc)
 - [ ] report output, templates, xml, json??
 - [x] automatic conversion from pickle style repo to xml
 - [x] save/load to xml
 - [-] need better search params for reports
 - [-] account for windows' path stuff
 - [-] write some real unit tests once the commands are solidified
+
+LINKS
+-----
+These might be of interest
+
+http://www.ericsink.com/entries/dbts_fossil.html
+http://nikolasco.livejournal.com/419924.html
+http://community.livejournal.com/evan_tech/248736.html
+http://oss.segetech.com/bugzilla-svn-wiki.html
