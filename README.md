@@ -122,10 +122,10 @@ or to set your name, globally
 
 Recognized configuration items are:
 
-user.name   [string]
-user.email  [string]
-editor      [string]
-ansi        [bool]
+    user.name   [string]
+    user.email  [string]
+    editor      [string]
+    ansi        [bool]
 
 Boolean items take [yes,on,1] or [no,off,0]
 
