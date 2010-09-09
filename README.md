@@ -99,9 +99,8 @@ active projects.
 
 Config
 ------
-~/.bugzrc
-
-PROJECT/.bugz/_bugzrc
+- (global) ~/.bugzrc
+- (local)  PROJECT/.bugz/_bugzrc
 
     ---[snip]---
     # comment
@@ -109,6 +108,7 @@ PROJECT/.bugz/_bugzrc
     user.name=your name
     user.email=me@someplace.com
     editor=vi
+    ansi=on
     ---[snip]---
 
 You can set key values with the 'config' command. For example, to set your
@@ -153,7 +153,7 @@ LINKS
 -----
 These might be of interest
 
-http://www.ericsink.com/entries/dbts_fossil.html
-http://nikolasco.livejournal.com/419924.html
-http://community.livejournal.com/evan_tech/248736.html
-http://oss.segetech.com/bugzilla-svn-wiki.html
+- http://www.ericsink.com/entries/dbts_fossil.html
+- http://nikolasco.livejournal.com/419924.html
+- http://community.livejournal.com/evan_tech/248736.html
+- http://oss.segetech.com/bugzilla-svn-wiki.html
