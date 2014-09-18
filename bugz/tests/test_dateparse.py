@@ -10,7 +10,7 @@ Copyright (c) 2010 J. Knight. All rights reserved.
 # -=-
 import unittest
 import sys, os
-sys.path.append(os.curdir + "/../../")
+import env
 # -=-
 
 from bugz.dateparse import DateParser

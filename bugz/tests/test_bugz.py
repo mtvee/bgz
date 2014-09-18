@@ -5,8 +5,7 @@ import unittest
 import sys, os
 import UserDict
 import shutil
-
-sys.path.append(os.curdir + "/../../")
+import env
 # -=-
 
 from bugz.bugz import Bugz, BugzError

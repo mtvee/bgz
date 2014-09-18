@@ -3,7 +3,7 @@
 # -=-
 import unittest
 import sys, os
-sys.path.append(os.curdir + "/../../")
+import env
 # -=-
 
 from bugz.issue import Issue
