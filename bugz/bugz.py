@@ -14,6 +14,7 @@ import datetime
 import dateparse
 import shutil
 import UserDict
+import platform
 
 from issue import Issue
 
@@ -42,8 +43,12 @@ class Bugz:
     
     def __init__( self, opts = UserDict.UserDict ):
         self.opts = opts
-        self.opts['editor'] = 'vi'
-        self.opts['user.name'] = os.environ['USER']
+        if platform.system() == 'Windows':
+            self.opts['editor'] = 'Notepad'
+            self.opts['user.name'] = os.environ['USERNAME']
+        else:
+            self.opts['editor'] = 'vi'
+            self.opts['user.name'] = os.environ['USER']
         self.opts['user.email'] = ''
         self.opts['ansi'] = self.opts.ansi
         self._read_init()
